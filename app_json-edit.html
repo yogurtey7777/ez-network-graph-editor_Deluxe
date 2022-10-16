@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>グラフデータ(JSON)の形式説明＋エディタ</title>
+
+  <script src="app_json-edit.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <details open>
+    <summary>グラフデータの形式(JSONについての説明)</summary>
+    詳細は英語の公式ドキュメントを読んでください(↓のやつは簡易説明) <br>
+    <a href="https://js.cytoscape.org/#notation/elements-json"
+      target="_blank">https://js.cytoscape.org/#notation/elements-json</a>
+    <br><br>以下は簡単なサンプル
+    <pre><code>[
+
+{"data":{"id":"AA","label":"構造体AA"},"position":{"x":0,"y":50},
+"style":{"background-color":"#ffffff","color":"#000000","shape":"rectangle"},"group":"nodes",},
+{"data":{"id":"AA1","parent":"AA","label":"あいうえお"},"position":{"x":0,"y":0},
+"style":{"background-color":"#969998","color":"#000000","shape":"rectangle"},"group":"nodes",},
+{"data":{"id":"AA2","parent":"AA","label":"12345"},"position":{"x":0,"y":50},
+"style":{"background-color":"#969998","color":"#000000","shape":"rectangle"},"group":"nodes",},
+{"data":{"id":"AA3","parent":"AA","label":"next(ポインタ)"},"position":{"x":0,"y":100},
+"style":{"background-color":"#969998","color":"#000000","shape":"rectangle"},"group":"nodes",},
+
+{"data":{"id":"nn1","source":"AA3","target":"AA","label":"エッジ"},
+"style":{"color":"#000000","line-color":"#9dbaea","target-arrow-color":"#9dbaea","target-arrow-shape":"triangle",
+"source-arrow-color":"#9dbaea","source-arrow-shape":"none"},"group":"edges",},
+
+]   </code></pre>
+    <p>
+      ★共通のやつ<br>
+      最初に「 [ 」、最後に「 ] 」を付ける(無いとエラーになる) <br>
+      「"group"」："nodes"(四角形)か"edges"(線)のどっちにするか決める<br>
+      「"id"」：それに割り当てられるidを決める(他と重複するとエラー)<br>
+      「"label"」：それのラベル(表示される文字)を決める。日本語可能・他と重複可能<br>
+      「"color"」：ノードのラベルの文字色を指定(HEX) <br>
+      「"position"」：それの位置をx座標とy座標で指定する。これ無だと自動的に0,0に配置。エッジだと書いても無意味<br>
+    </p>
+
+    <table border="1">
+      <td>
+        <p>
+          ★"nodes"(四角形)だけに書くやつ<br>
+          「"parent"」：所属する親ノードを書く。<br>
+          「"background-color"」：ノードの背景色を指定(HEX) <br>
+          「"shape"」：ノードの形状を指定する(選択)
+        </p>
+      </td>
+      <td>
+        <p>
+          ★"edges"(線)だけに書くやつ<br>
+          「"source"」：線が出る元のノード<br>
+          「"target"」：線が着く到着先のノード <br>
+          「"line-color"」：線の色を指定する <br><br>
+          「"target-arrow-color"」：到着先のノード側の矢印の色を指定(HEX) <br>
+          「"target-arrow-shape"」：到着先のノード側の矢印の形状を指定(選択)<br><br>
+          「"source-arrow-color"」：出発元のノード側の矢印の色を指定(HEX)<br>
+          「"source-arrow-shape"」：出発元のノード側の矢印の形状を指定(選択)
+        </p>
+      </td>
+
+    </table>
+
+  </details><br><br><br>
+
+  <details>
+    <summary>簡易JSONエディタはこちらに</summary>
+    <p>
+      ヒント：フォームをクリックした状態で「Ctrl＋A」で全選択<br>
+      ヒント：↑の状態で「Ctrl＋C」でフォームの内容をコピー<br>
+      ヒント：コピーしている状態で「Ctrl＋V」で貼り付けることができる
+    </p>
+
+    <table border="1">
+
+      <tr>
+        <td>
+          <br>★ノードを一個作るフォーム<br>
+          id：<input type="text" id="node_id" value="test1" style="width:50px;" />
+          label(文字)：<input type="text" id="node_label" value="test1" style="width:50px;" />
+          color(ラベルの色)：<input type="color" id="node_labelcolor" value="#000000"><br>
+          position：x<input type="number" id="node_x" value="0" style="width:50px;" />
+          y<input type="number" id="node_y" value="0" style="width:50px;" />
+          parent：<input type="text" id="node_parent" value="test1" style="width:50px;" />
+          parent無にする<input type="checkbox" id="node_parent_check"><br>
+          background-color：<input type="color" id="node_backcolor" value="#969998">
+
+          shape(ノードの形状)<select id="node_shape">
+            <option value="ellipse">ellipse(楕円形、おすすめ)</option>
+            <option value="triangle">triangle(三角形)</option>
+            <option value="round-triangle">round-triangle(角が丸い三角形)</option>
+            <option value="rectangle" selected>rectangle(長方形、おすすめ)</option>
+            <option value="round-rectangle">round-rectangle(角が丸い四角形)</option>
+            <option value="barrel">barrel(タルのような形)</option>
+            <option value="rhomboid">rhomboid(ひし形？)</option>
+            <option value="diamond">diamond(ダイヤモンドの形)</option>
+            <option value="round-diamond">round-diamond(角が丸いダイヤモンド)</option>
+            <option value="pentagon">pentagon(六角形)</option>
+            <option value="round-pentagon">round-pentagon(角が丸い六角形)</option>
+            <option value="hexagon">hexagon(八角形)</option>
+            <option value="round-hexagon">round-hexagon(角が丸い八角形)</option>
+            <option value="heptagon">heptagon(七角形)</option>
+            <option value="round-heptagon">round-heptagon(角が丸い七角形)</option>
+            <option value="octagon">octagon(八角形)</option>
+            <option value="round-octagon">round-octagon(角が丸い八角形)</option>
+            <option value="star">star(星型)</option>
+            <option value="tag">tag(鉛筆のような形)</option>
+            <option value="round-tag">round-tag(先が丸い鉛筆のような形)</option>
+            <option value="vee">vee(アルファベットのVのような形)</option>
+          </select><br><br><br>
+
+          <button onclick="GenerateNodeJson()">上記の設定でノードのJSON生成(下側に追記されていきます)</button><br>
+          <textarea id="node_json" cols="100" rows="1"></textarea><br>
+          <button onclick="graphJsonCopy(`node_json`)">クリップボードにコピー</button><br><br>
+        </td>
+
+      </tr>
+
+      <tr>
+        <td>
+          <br>★エッジを一個作るフォーム<br>
+          id：<input type="text" id="edge_id" value="test1" style="width:50px;" />
+          label(文字)：<input type="text" id="edge_label" value="test1" style="width:50px;" />
+          color(ラベルの色)：<input type="color" id="edge_labelcolor" value="#000000"><br>
+          source(出発元)：<input type="text" id="edge_source" value="test1" style="width:50px;" />
+          target(到着先)：<input type="text" id="edge_target" value="test1" style="width:50px;" />
+          line-color(線の色)：<input type="color" id="edge_linecolor" value="#9dbaea"><br>
+          target-arrow-color(到着先矢印の色)：<input type="color" id="edge_t_arrow_color" value="#9dbaea">
+          target-arrow-shape(到着先矢印の形状)：<select id="edge_t_arrow_shape">
+            <option value="none">none(矢印無し)</option>
+            <option value="triangle" selected>triangle(一般的な三角形矢印)</option>
+            <option value="triangle-tee">triangle-tee(根本に四角形付いた三角形)</option>
+            <option value="circle-triangle">circle-triangle(三角形の先に丸)</option>
+            <option value="triangle-cross">triangle-cross(triangle-teeと同じ？？)</option>
+            <option value="triangle-backcurve">triangle-backcurve(やや丸い三角形矢印)</option>
+            <option value="vee">vee(やや尖っている三角形矢印)</option>
+            <option value="tee">tee(短い長方形)</option>
+            <option value="square">square(正方形)</option>
+            <option value="circle">circle(普通の丸)</option>
+            <option value="diamond">diamond(ダイヤモンドの形)</option>
+            <option value="chevron">chevron(カクカクしてる矢印)</option>
+          </select><br>
+          source-arrow-color(出発元矢印の色)：<input type="color" id="edge_s_arrow_color" value="#9dbaea">
+          source-arrow-shape(出発元矢印の形状)：<select id="edge_s_arrow_shape">
+            <option value="none" selected>none(矢印無し)</option>
+            <option value="triangle">triangle(一般的な三角形矢印)</option>
+            <option value="triangle-tee">triangle-tee(根本に四角形付いた三角形)</option>
+            <option value="circle-triangle">circle-triangle(三角形の先に丸)</option>
+            <option value="triangle-cross">triangle-cross(triangle-teeと同じ？？)</option>
+            <option value="triangle-backcurve">triangle-backcurve(やや丸い三角形矢印)</option>
+            <option value="vee">vee(やや尖っている三角形矢印)</option>
+            <option value="tee">tee(短い長方形)</option>
+            <option value="square">square(正方形)</option>
+            <option value="circle">circle(普通の丸)</option>
+            <option value="diamond">diamond(ダイヤモンドの形)</option>
+            <option value="chevron">chevron(カクカクしてる矢印)</option>
+          </select>
+          <!-- 個別のエッジにcurve-styleを設定しようとするエラー出る(全部一括指定にする必要あり) -->
+          <!-- curve-style(線の曲がりスタイル)：<select id="edge_curve">
+            <option value="haystack">haystack(高速だがループとコンパウンドに非対応)</option>
+            <option value="straight">straight(ストレートなやつで全部の矢印に対応)</option>
+            <option value="straight-triangle">straight-triangle</option>
+            <option value="bezier" selected>bezier</option>
+            <option value="unbundled-bezier">triangle-cross(triangle-teeと同じ？？)</option>
+            <option value="triangle-backcurve">triangle-backcurve(やや丸い三角形矢印)</option>
+            <option value="segments">segments</option>
+            <option value="taxi">taxi(階層的に束ねられている)</option>
+          </select> -->
+          <br><br><br>
+
+          <button onclick="GenerateEdgeJson()">上記の設定でエッジのJSON生成(下側に追記されていきます)</button><br>
+          <textarea id="edge_json" cols="100" rows="1"></textarea><br>
+          <button onclick="graphJsonCopy(`edge_json`)">クリップボードにコピー</button><br><br>
+        </td>
+      </tr>
+    </table><br>
+
+    <span>メモスペース</span><br>
+    <table>
+      <tr->
+        <td>
+          <textarea id="memo1" cols="30" rows="10"></textarea><br>
+          <button onclick="graphJsonCopy(`memo1`)">クリップボードにコピー</button><br>
+          <input type="text" id="JsonData_filename1" value="test1" style="width:50px;" />
+          <button onclick="graphJsonFileSave(`JsonData_filename1`,`JsonData_filename1`)">←の名前でtxt保存</button>
+
+        </td>
+        <td>
+          <textarea id="memo2" cols="30" rows="10"></textarea><br>
+          <button onclick="graphJsonCopy(`memo2`)">クリップボードにコピー</button><br>
+          <input type="text" id="JsonData_filename2" value="test2" style="width:50px;" />
+          <button onclick="graphJsonFileSave(`JsonData_filename2`,`JsonData_filename2`)">←の名前でtxt保存</button>
+        </td>
+        <td>
+          <textarea id="memo3" cols="30" rows="10"></textarea><br>
+          <button onclick="graphJsonCopy(`memo3`)">クリップボードにコピー</button><br>
+          <input type="text" id="JsonData_filename3" value="test3" style="width:50px;" />
+          <button onclick="graphJsonFileSave(`JsonData_filename3`,`JsonData_filename3`)">←の名前でtxt保存</button>
+        </td>
+      </tr->
+    </table>
+
+
+
+
+  </details>
+
+</body>
+
+</html>

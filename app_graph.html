@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Cytoscape.js -->
+  <script src="js-library/cytoscape.min.js"></script>
+  <script src="js-library/jquery-3.6.0.min.js"></script>
+  <!-- 階層構造(dager)で使用するjs -->
+  <script src="js-library/dagre.min.js"></script>
+  <script src="js-library/cytoscape-dagre.js"></script>
+
+  <!-- SVGの保存で使用するjs -->
+  <script src="js-library/FileSaver.js"></script>
+  <script src="js-library/cytoscape-svg.js"></script>
+
+  <!-- パンズーム(ズームバーで使用するjsとcss) -->
+  <script src="js-library/cytoscape-panzoom.min.js"></script>
+  <link rel="stylesheet" href="css-library/font-awesome.min.css">
+  <link rel="stylesheet" href="css-library/cytoscape.js-panzoom.min.css">
+
+  <!-- エッジの折り曲げ(jsとcss) -->
+  <script src="js-library/konva.min.js"></script>
+  <script src="js-library/cytoscape-context-menus.js"></script>
+  <script src="js-library/cytoscape-undo-redo.js"></script>
+  <script src="js-library/cytoscape-edge-editing.js"></script>
+  <link rel="stylesheet" href="css-library/cytoscape-context-menus.css">
+
+
+  <script src="app_graph.js"></script>
+  <link rel="stylesheet" href="style.css" />
+
+  <title>簡易的なグラフ/ネットワーク図エディタ(Cytoscape.js使用)</title>
+</head>
+
+<body>
+
+
+
+
+  <h1>簡易なグラフ/ネットワーク図エディタ(Cytoscape.jsを使用)</h1>
+
+  <!-- このアプリの概要・参考にしたサイト -->
+  <details>
+    <summary>このアプリの概要・参考にしたサイト・使用したライブラリ(非常に長い)</summary>
+    <h1>準備中</h1>
+  </details><br>
+
+
+  <!-- PNG画像のボタンと設定フォーム -->
+  <details>
+    <summary>PNG画像/SVG画像で保存する機能</summary>
+
+
+    <br>
+    <span>PNG画像のスケールの値(1が最低、5程度が普通、19が最大？):</span>
+    <input type=" number" id="png_scale" value="5" style="width:40px;" /><br>
+
+    <span>PNG画像の背景色(カラーピッカーで指定、透過も行ける):</span>
+    <input type="color" input id="colorPicker">
+    <label><input type="radio" name="transparent" value="no" checked>透過しない</label>
+    <label><input type="radio" id="tras_yes" name="transparent" value="yes">透過する</label><br>
+    <b>※PNG画像の保存対象は画面に写ってる部分だけなので注意</b> <br><br>
+    <span>ファイル名(拡張子含まず)</span>
+    <input type="text" id="png_name" value="test" /><br>
+    <button onclick="downloadPng()">ここをクリックでPNG画像を保存する</button>
+    <br><br>
+    <hr border="none">
+
+    <br>
+    <!-- SVG画像のボタン -->
+    <span>画面範囲外にあるやつも含め、全ての要素をSVGに出力します</span><br>
+    <span>SVG画像を閲覧する(別ページ開く＋右クリックで保存も可能)</span><br>
+    <button onclick="getSvgUrl()">ここをクリックでSVG画像を閲覧</button><br><br>
+    <span>ファイル名(拡張子含まず)</span>
+    <input type="text" id="svg_name" value="test" /><br>
+    <button onclick="saveAsSvg()">ここをクリックでSVG画像を保存する</button><br>
+
+    <br>
+
+
+
+  </details><br>
+
+
+
+
+
+  <details>
+    <!-- レイアウト指定＋JSONの読み込み/保存 -->
+    <summary>グラフデータ(JSON)の形式説明　＆　読み込み・追加・保存</summary>
+    <span><b>データ(JSON)の形式の説明＋簡易JSONエディタはこちら→</b></span>
+    <a href="app_json-edit.html" target="_blank">【ここをクリックすると別タブに出る】</a><br>
+    ※JSONのケツカンマ<code>,}</code>や<code>},]</code>は読み込む前に削除します<br>
+    ※JSONにケツカンマ以外の構文エラーあった場合、読み込んでも何も出ません<br>
+    ※保存ボタンで出力されるのはケツカンマがあるJSONなので注意が必要です<br>
+    <table>
+      <tr>
+        <td>
+          <details open>
+            <summary>JSONの読み込み</summary>
+            <!-- JSONの読み込み-->
+            <button id="IdBtnRead" onclick="readGraphJson()">↓のJSONを読込みグラフ表示</button><br>
+            <textarea id="LoadJsonData" cols="75" rows="15">
+[
+
+{"data": {"id": "S1","label": "s1*"}},
+
+{"data": {"id": "A","label": "構造体A"}},
+{"data": {"id": "A1","parent": "A","label": "あいうえお"}},
+{"data": {"id": "A2","parent": "A","label": "12345"}},
+{"data": {"id": "A3","parent": "A","label": "next(ポインタ)"}},
+
+{"data": {"id": "B","label": "構造体B"}},
+{"data": {"id": "B1","parent": "B","label": "かきくけこ"}},
+{"data": {"id": "B2","parent": "B","label": "6789"}},
+{"data": {"id": "B3","parent": "B","label": "next(ポインタ)2"}},
+
+{"data": {"id": "n1","source": "A3","target": "B"}},
+{"data": {"id": "n2","source": "S1","target": "A"}},
+
+]
+             </textarea><br>
+            <button onclick="graphJsonCopy(`LoadJsonData`)">クリップボードにコピー</button>
+            <br><br>
+          </details>
+
+        </td>
+
+
+
+        <td>
+          <details>
+            <summary>JSONの追加</summary>
+            <button id="IdBtnAdd" onclick="addGraphJson()">追加</button><br>
+            <textarea id="AddJsonData" cols="1" rows="10">
+[
+{"data":{"id":"AA","label":"構造体AA"},"position":{"x":0,"y":50},"group":"nodes",},
+{"data":{"id":"AA1","parent":"AA","label":"あいうえお"},"position":{"x":0,"y":0},"group":"nodes",},
+{"data":{"id":"AA2","parent":"AA","label":"12345"},"position":{"x":0,"y":50},"group":"nodes",},
+{"data":{"id":"AA3","parent":"AA","label":"next(ポインタ)"},"position":{"x":0,"y":100},"group":"nodes",},
+{"data":{"id":"nn1","source":"AA3","target":"AA","label":"n2"},"position":{"x":0,"y":0},"group":"edges",},
+]
+            </textarea><br>
+            <button onclick="graphJsonCopy(`AddJsonData`)">クリップボードにコピー</button>
+            <br><br>
+          </details>
+        </td>
+
+        <td>
+          <details>
+            <summary>JSONの保存</summary>
+            <!-- JSONの保存-->
+            <p>【メモ】：ケツカンマを消すか消さないかのラジオボタン入れる</p>
+            <button id="IdBtnSave" onclick="graphJsonSave_ALL()">全部のデータ保存する</button>
+            <button id="IdBtnSave_P" onclick="graphJsonSave_P()">基本のデータだけ保存</button><br>
+            <textarea id="SaveJsonData" cols="30" rows="10"></textarea><br>
+            <button onclick="graphJsonCopy(`SaveJsonData`)">クリップボードにコピー</button><br><br>
+            <input type="text" id="JsonData_filename" value="test" style="width:50px;" />
+            <button onclick="graphJsonFileSave()">←の名前でtxt保存</button>
+            <br><br>
+          </details>
+
+        </td>
+
+      </tr>
+    </table>
+    <br><br>
+  </details><br>
+
+  <details>
+    <summary>インスペクター＆エッジとノードを編集する機能</summary>
+
+    :左クリックしたノード/エッジの情報を表示＋編集
+    <button onclick="changeElemJson()">ここをクリックで以下の設定を反映する</button><br><br><br>
+
+
+    <table border="1">
+      <tr>
+        <td style="border-bottom: none">
+          ノードorエッジ(変更不可)：<input type="text" id="now_elem_group" style="width:40px;" readonly><br><br>
+          id(識別用、変更不可)：<input type="text" id="now_elem_id" style="width:55px;" readonly><br>
+          label(表示文字)：<input type="text" id="now_changelabel" style="width:80px;"><br>
+          position：<br>x：<input type="text" id="now_pos_x" style="width:80px;">
+          y：<input type="text" id="now_pos_y" style="width:80px;"><br><br>
+          color(labelの色)：<input type="color" id="now_labelcolor" value="#000000">
+          <input type="text" id="now_labelcolor_str" style="width:55px;"><br>
+        </td>
+
+
+
+        <td>
+          <!-- ここのラジオボタンはCSSでreadonlyを強引にやっています。 -->
+          ノードのみの情報<input id="now_elem_type_node" type="radio" name="now_elem_type" readonly><br><br>
+          <div id="node_inspector">
+            parent：<input type="text" id="now_parent"><br><br>
+            background-color：<br><input type="color" id="now_backgroundcolor" value="#000000">
+            <input type="text" id="now_backgroundcolor_str" style="width:55px;"><br><br>
+            shape：<select id="now_shape">
+              <option value="ellipse">ellipse</option>
+              <option value="triangle">triangle</option>
+              <option value="round-triangle">round-triangle</option>
+              <option value="rectangle" selected>rectangle</option>
+              <option value="round-rectangle">round-rectangle</option>
+              <option value="barrel">barrel</option>
+              <option value="rhomboid">rhomboid</option>
+              <option value="diamond">diamond</option>
+              <option value="round-diamond">round-diamond</option>
+              <option value="pentagon">round-pentagon</option>
+              <option value="round-pentagon">round-pentagon</option>
+              <option value="hexagon">hexagon</option>
+              <option value="round-hexagon">round-hexagon</option>
+              <option value="heptagon">heptagon</option>
+              <option value="round-heptagon">round-heptagon</option>
+              <option value="octagon">octagon</option>
+              <option value="round-octagon">round-octagon</option>
+              <option value="star">star</option>
+              <option value="tag">tag</option>
+              <option value="round-tag">round-tag</option>
+              <option value="vee">vee</option>
+            </select><br>
+          </div>
+        </td>
+
+        <td>
+          <!-- ここのラジオボタンはCSSでreadonlyを強引にやっています。 -->
+          エッジのみの情報<input id="now_elem_type_edge" type="radio" name="now_elem_type" readonly><br>
+          <div id="edge_inspector">
+
+            source：<input type="text" id="now_source" value="" style="width:55px;">
+            target：<input type="text" id="now_target" value="" style="width:55px;"><br>
+            line-color：<input type="color" id="now_linecolor" value="#000000">
+            <input type="text" id="now_linecolor_str" value="#000000" style="width:55px;"><br><br>
+            target-arrow-color：<input type="color" id="now_t_arr_color" value="#000000">
+            <input type="text" id="now_t_arr_color_str" value="#000000" style="width:55px;"><br>
+            target-arrow-shape：<select id="now_t_arr_shape">
+              <option value="none">none</option>
+              <option value="triangle" selected>triangle</option>
+              <option value="triangle-tee">triangle-tee</option>
+              <option value="circle-triangle">circle-triangle</option>
+              <option value="triangle-cross">triangle-cross</option>
+              <option value="triangle-backcurve">triangle-backcurve</option>
+              <option value="vee">vee</option>
+              <option value="tee">tee</option>
+              <option value="square">square</option>
+              <option value="circle">circle</option>
+              <option value="diamond">diamond</option>
+              <option value="chevron">chevron</option>
+            </select><br>
+            source-arrow-color：<input type="color" id="now_s_arr_color" value="#000000">
+            <input type="color" id="now_s_arr_color_str" value="#000000"><br>
+            source-arrow-shape：<select id="now_s_arr_shape">
+              <option value="none">none</option>
+              <option value="triangle" selected>triangle</option>
+              <option value="triangle-tee">triangle-tee</option>
+              <option value="circle-triangle">circle-triangle</option>
+              <option value="triangle-cross">triangle-cross</option>
+              <option value="triangle-backcurve">triangle-backcurve</option>
+              <option value="vee">vee</option>
+              <option value="tee">tee</option>
+              <option value="square">square</option>
+              <option value="circle">circle</option>
+              <option value="diamond">diamond</option>
+              <option value="chevron">chevron</option>
+            </select><br>
+          </div>
+        </td>
+      </tr>
+
+    </table><br><br>
+  </details>
+  <table border="1">
+    <tr>
+      <td>
+        カーソル上のノード/エッジのidを表示：<input type="text" id="qmenu_mouseover_elem_id" value="" style="width:85px;" readonly>
+        labelを表示：<input type="text" id="qmenu_mouseover_elem_label" value="" style="width:100px;" readonly>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        右クリで新規作成するノード/エッジのラベル：<input type="text" id="qmenu_elem_label" value="" style="width:85px;">
+        id(重複不可,後で変更不可)：<input type="text" id="qmenu_elem_id" value="" style="width:85px;"><br>
+        [ノードのみ]parentのid：<input type="text" id="qmenu_elem_parent" value="" style="width:85px;">
+        [エッジのみ]sourceのid：<input type="text" id="qmenu_elem_source" value="" style="width:85px;">
+        targetのid：<input type="text" id="qmenu_elem_target" value="" style="width:85px;">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        右クリでラベル変更する時のテキスト：<input type="text" id="select_changelabel" value="">
+        右クリで色変更する時の色：<input type="color" id="select_changecolor" value="#000000">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <!-- レイアウト指定-->
+        ノードの配置[<a href="https://js.cytoscape.org/#layouts" target="_blank">レイアウト</a>]を選択(<b>位置変更したの消えるので注意</b>)
+        <select id="selectLayout">
+          <option value="null">null(レイアウト無し、全部0,0)</option>
+          <option value="dagre" selected>dagre(階層構造にする、おすすめ)</option>
+          <option value="grid">grid(グリッド状にする、おすすめ)</option>
+          <option value="random">random(文字通り、ランダム)</option>
+          <option value="circle">circle(サークル状にする)</option>
+          <option value="concentric">concentric(同心円？にする)</option>
+          <option value="breadthfirst">breadthfirst(幅優先探索にする)</option>
+          <option value="cose">cose(よくわからない)</option>
+        </select>
+        <button id="changeLayout" onclick="changeLayout()">適用する</button>
+        <br>
+
+        <!-- エッジのスタイルを変える方法はないので無理だった -->
+        [<a href="https://js.cytoscape.org/#style/bezier-edges"
+          target="_blank">エッジを曲げる形式</a>]を選択(<b>削除復元用履歴が消えるので注意</b>)
+        <select id="edge_curve">
+          <option value="haystack">haystack(高速だが色々と非対応)</option>
+          <option value="straight">straight(ストレートなやつ)</option>
+          <option value="straight-triangle">straight-triangle(先っぽが細い)</option>
+          <option value="bezier" selected>bezier(多分普通のやつ、おすすめ)</option>
+          <option value="unbundled-bezier">unbundled-bezier(曲がってる)</option>
+          <option value="segments">segments(真ん中で折れてる)</option>
+          <option value="taxi">taxi(階層のようなやつ、おすすめ)</option>
+        </select>
+        <input type="button" value="再読込で反映" onclick="window.location.reload();" /><br>
+      </td>
+    </tr>
+  </table>
+
+
+  <div id="cyWrapper">
+    <div id="cy"></div>
+  </div>
+
+  <p>Ctrl＋z・Ctrl＋yは座標、右クリは削除要素→戻る/進めるできます(<b>ページ更新すると削除復元用履歴消えるので注意</b>)</p>
+
+  <input type="hidden" value="" id="HiddenNowJsonData">
+  <input type="hidden" value="1" id="cy_zoom">
+  <input type="hidden" value="0" id="cy_pan_x">
+  <input type="hidden" value="0" id="cy_pan_y">
+
+
+
+</body>
+
+</html>
