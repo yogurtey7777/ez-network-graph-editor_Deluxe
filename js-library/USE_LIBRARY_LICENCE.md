@@ -37,10 +37,10 @@ U. Dogrusoz , A. Karacelik, I. Safarli, H. Balci, L. Dervishi, and M.C. Siper, "
 
 
 # GPLv3のライブラリ
-## cytoscape-svg(https://github.com/kinimesi/cytoscape-svg)
+## ◎cytoscape-svg(https://github.com/kinimesi/cytoscape-svg)
 <br><br><br>
 
 # アイコンはCC BY 4.0、フォントはSIL OFL 1.1、コードはMIT
 
-## Font-Awesome(https://github.com/FortAwesome/Font-Awesome)
+## ◎Font-Awesome(https://github.com/FortAwesome/Font-Awesome)
 <br><br><br>
