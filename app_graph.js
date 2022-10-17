@@ -322,8 +322,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
       {
         //右クリックからノードの色を変更する
-        //ここでの色変更は一時的なものなので、保存時のJSONには反映されない
-        //JSONに反映される色変更のやり方がわからない
         id: 'node-color',
         content: 'ノードの色を変更する',
         tooltipText: 'change color',
@@ -338,6 +336,7 @@ document.addEventListener('DOMContentLoaded', function () {
             onClickFunction: function (event) {
 
               let target = event.target || event.cyTarget;
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
               target_node_color_change(target, `${select_changecolor.value}`);
             },
           },
@@ -348,13 +347,28 @@ document.addEventListener('DOMContentLoaded', function () {
             hasTrailingDivider: true,
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
-              let rgb = ColorToHex(event.target.style('background-color'));
 
-              //現時点の使用では、選択状態＝反転色なので色をそのまま使用すればOK
-              //反転色にするかは変更する可能性あり
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
+              let rgb = ColorToHex(target.style('background-color'));
+
+              //選択の状態が解除されて選択色から元の色に戻った時点で色を反転させる
               if (target.selected() === true) {
-                target_node_color_change(target, `${target.style('background-color')}`);
+                console.log("bug");
+                target.one('unselect', function (event) {
+                  //targetのスタイルのどれかの値が変更されたら(超重要なイベントです)
+                  //https://js.cytoscape.org/#events/collection-events
+                  //＝選択による色変更が終了したら
+
+                  target.one('style', function () {
+                    //色を変更する
+                    rgb = ColorToHex(target.style('background-color'));
+                    target.style('background-color', `${invertColor(rgb)}`);
+                  });
+
+
+                });
               } else {
+                //選択されてない場合は、普通にそのまま判定させればOK
                 target_node_color_change(target, `${invertColor(rgb)}`);
               }
             },
@@ -366,6 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
             hasTrailingDivider: true,
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
+              target.unselect();
               target_node_color_change(target, '#969998');
             },
           },
@@ -375,6 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tooltipText: 'blue',
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
+              target.unselect();
               target_node_color_change(target, 'blue');
             },
             submenu: [
@@ -385,6 +401,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 hasTrailingDivider: true,
                 onClickFunction: function (event) {
                   let target = event.target || event.cyTarget;
+                  target.unselect();
                   target_node_color_change(target, 'lightblue');
                   //選択中(色反転)に色変更されたことを想定
                 },
@@ -396,6 +413,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 hasTrailingDivider: true,
                 onClickFunction: function (event) {
                   let target = event.target || event.cyTarget;
+                  target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
                   target_node_color_change(target, 'darkblue');
                 },
               },
@@ -408,6 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
             hasTrailingDivider: true,
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
               target_node_color_change(target, 'green');
             },
           },
@@ -417,6 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tooltipText: 'red',
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
               target_node_color_change(target, 'red');
             },
           },
@@ -436,6 +456,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tooltipText: 'select-color',
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
               target_edge_color_change(target, `${select_changecolor.value}`);
             },
           },
@@ -446,16 +467,30 @@ document.addEventListener('DOMContentLoaded', function () {
             hasTrailingDivider: true,
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
-              let rgb = ColorToHex(event.target.style('line-color'));
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
+              let rgb = ColorToHex(target.style('line-color'));
 
 
-              //現時点の使用では、選択状態＝反転色なので色をそのまま使用すればOK
-              //反転色にするかは変更する可能性あり
-              //エッジの場合はとりあえずline-colorの反転色とする
+              //選択の状態が解除されて選択色から元の色に戻った時点で色を反転させる
               if (target.selected() === true) {
-                target_edge_color_change(target, `${target.style('line-color')}`);
+                target.one('unselect', function () {
+                  //targetのスタイルのどれかの値が変更されたら(超重要なイベントです)
+                  //https://js.cytoscape.org/#events/collection-events
+                  //＝選択による色変更が終了したら
+                  target.one('style', function () {
+
+                    //色を変更する
+                    rgb = ColorToHex(target.style('line-color'));
+                    target.style('line-color', `${invertColor(rgb)}`);
+                    target.style('target-arrow-color', `${invertColor(rgb)}`);
+                    target.style('source-arrow-color', `${invertColor(rgb)}`);
+                  });
+
+                });
               } else {
+                //選択されてない場合は、普通にそのまま判定させればOK
                 target_edge_color_change(target, `${invertColor(rgb)}`);
+
               }
             },
           },
@@ -465,6 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tooltipText: 'light-gray',
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
               target_edge_color_change(target, `#969998`);
             },
           },
@@ -483,6 +519,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 tooltipText: 'light blue',
                 onClickFunction: function (event) {
                   let target = event.target || event.cyTarget;
+                  target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
                   target_edge_color_change(target, 'lightblue');
                 },
               },
@@ -492,6 +529,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 tooltipText: 'dark blue',
                 onClickFunction: function (event) {
                   let target = event.target || event.cyTarget;
+                  target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
                   target_edge_color_change(target, 'darkblue');
                 },
               },
@@ -503,6 +541,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tooltipText: 'green',
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
               target_edge_color_change(target, 'green');
             },
           },
@@ -512,6 +551,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tooltipText: 'red',
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
               target_edge_color_change(target, 'red');
             },
           },
@@ -738,10 +778,31 @@ document.addEventListener('DOMContentLoaded', function () {
   //「選択(select)での色変更」→「コンテキストメニューでの色変更」→「非選択(unselect)での色変更」
   //となってしまうのを防ぐためにこのような「selectで色反転→unselect元に戻す」
   //「コンテキストの方はunselect後のstyle変更時に色変更」という処理をしている
+
+
+
   cy.on('select', 'node, edge', function (event) {
+    let select_elem_prop_color;
+    let select_elem_prop_back_color;
 
+    if (event.target.group() === "nodes") {
 
+      select_elem_prop_color = event.target.style('color');
+      select_elem_prop_back_color = event.target.style('background-color');
+      event.target.style('color', `#fc4d4d`);
+      event.target.style('background-color', `#3894fc`);
 
+    } else {
+      select_elem_prop_color = event.target.style('color');
+      select_elem_prop_back_color = event.target.style('line-color');
+
+      event.target.style('color', `#fc4d4d`);
+      event.target.style('line-color', `#3894fc`);
+      event.target.style('target-arrow-color', `#3894fc`);
+      event.target.style('source-arrow-color', `#3894fc`);
+    }
+
+    /*色反転にしていたときのやつ
     if (event.target.group() === "nodes") {
       let rgb = ColorToHex(event.target.style('background-color'));
       event.target.style('background-color', `${invertColor(rgb)}`);
@@ -752,93 +813,83 @@ document.addEventListener('DOMContentLoaded', function () {
       event.target.style('target-arrow-color', `${invertColor(rgb)}`);
       event.target.style('source-arrow-color', `${invertColor(rgb)}`);
     }
-
-
-
-    /*
-    event.target.style('line-color', `${invertColor(rgb)}`);
-    event.target.style('target-arrow-color', `${invertColor(rgb)}`);
-    event.target.style('source-arrow-color', `${invertColor(rgb)}`);
     */
 
-    // event.target.once('unselect', function () {
-    //   console.log(event.target.data('label'))
-    //   let rgb = ColorToHex(event.target.style('background-color'));
-    //   event.target.style('background-color', `${invertColor(rgb)}`);
-    //   //console.log("testfuckkkkkkk");
-    // })
-  });
+    //ここでoneにしないと、一回選択されたやつが解除される度に実行されてしまう
+    event.target.one("unselect", function () {
+      console.log("test:unselect");
+      if (event.target.group() === "nodes") {
+        event.target.style('color', select_elem_prop_color);
+        event.target.style('background-color', select_elem_prop_back_color);
 
-
-
-
-  cy.on("unselect", 'node, edge', function (event) {
-
-    if (event.target.group() === "nodes") {
-      let rgb = ColorToHex(event.target.style('background-color'));
-      event.target.style('background-color', `${invertColor(rgb)}`);
-
-    } else {
-      let rgb = ColorToHex(event.target.style('line-color'));
-      event.target.style('line-color', `${invertColor(rgb)}`);
-      event.target.style('target-arrow-color', `${invertColor(rgb)}`);
-      event.target.style('source-arrow-color', `${invertColor(rgb)}`);
-    }
-
-  });
-
-  //選択されたノードがフリーになった(selectの前)
-
-
-  //選択が解除されたときの処理
-  //https://js.cytoscape.org/#events/collection-events
-  //複数選択して右クリックで色変更した時、色変更後にこれが適用されるの防ぐため
-  //右クリックの色変更の方でターゲットの選択解除を行う必要があるのを注意
-
-  /*
-  cy.on('unselect', 'node, edge', function (event) {
-
-    //event.target.style('background-color', 'green');
-
-  });
-  */
-
-  //マウスから離れた時の処理
-  //https://js.cytoscape.org/#events/collection-events 
-  //https://github.com/cytoscape/cytoscape.js/issues/1918 
-
-
-
-
-
-  //ノードかエッジかで何かするための部分(未実装)
-  // let now_elem_type_btn = document.querySelectorAll(`input[type='radio'][name='now_elem_type']`);
-  // if (elem_btn.id === 'now_elem_type_node') {
-  //   //ノードの時の処理
-  // } else {
-  //   //エッジの時の処理
-  // }
-
-  /*
-  now_elem_type_btn.forEach(function (elem_btn) {
-    elem_btn.addEventListener("change", function () {
-      console.log("tetetetetetetetete");
-
-      if (elem_btn.id === 'now_elem_type_node') {
-        edge_inspector.classList.add("disabled");
-        node_inspector.classList.remove("disabled");
       } else {
-        node_inspector.classList.add("disabled");
-        edge_inspector.classList.remove("disabled");
+        event.target.style('color', select_elem_prop_color);
+        event.target.style('line-color', select_elem_prop_back_color);
+        event.target.style('target-arrow-color', select_elem_prop_back_color);
+        event.target.style('source-arrow-color', select_elem_prop_back_color);
       }
     });
-  });*/
+
+    /*
+      cy.on("unselect", 'node, edge', function (event) {
+    
+        if (event.target.group() === "nodes") {
+          event.target.style('color', select_elem_prop_color);
+          event.target.style('background-color', select_elem_prop_back_color);
+    
+        } else {
+          event.target.style('color', select_elem_prop_color);
+          event.target.style('line-color', select_elem_prop_back_color);
+          event.target.style('target-arrow-color', select_elem_prop_back_color);
+          event.target.style('source-arrow-color', select_elem_prop_back_color);
+        }
+    
+      });
+    */
+
+
+    //選択が解除されたときの処理
+    //https://js.cytoscape.org/#events/collection-events
+    //複数選択して右クリックで色変更した時、色変更後にこれが適用されるの防ぐため
+    //右クリックの色変更の方でターゲットの選択解除を行う必要があるのを注意
+
+
+    //マウスから離れた時の処理
+    //https://js.cytoscape.org/#events/collection-events 
+    //https://github.com/cytoscape/cytoscape.js/issues/1918 
+
+
+
+
+
+    //ノードかエッジかで何かするための部分(未実装)
+    // let now_elem_type_btn = document.querySelectorAll(`input[type='radio'][name='now_elem_type']`);
+    // if (elem_btn.id === 'now_elem_type_node') {
+    //   //ノードの時の処理
+    // } else {
+    //   //エッジの時の処理
+    // }
+
+    /*
+    now_elem_type_btn.forEach(function (elem_btn) {
+      elem_btn.addEventListener("change", function () {
+        console.log("tetetetetetetetete");
+  
+        if (elem_btn.id === 'now_elem_type_node') {
+          edge_inspector.classList.add("disabled");
+          node_inspector.classList.remove("disabled");
+        } else {
+          node_inspector.classList.add("disabled");
+          edge_inspector.classList.remove("disabled");
+        }
+      });
+    });*/
+
+
+  });
 
 
 });
-
-
-
 
 
 
@@ -1134,6 +1185,9 @@ const chamgeElemJson_handle = function () {
       nowSelectedElemData.one('style', function () {
         //プロパティを変更する
         changeElemJson();
+
+
+
       });
 
     });
