@@ -344,7 +344,8 @@ document.addEventListener('DOMContentLoaded', function () {
             tooltipText: 'select-color',
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
-              let rgb = ColorToHex(event.target.style('background-color'));
+              let rgb = ColorToHex(event.target.style('line-color'));
+
 
               //現時点の使用では、選択状態＝反転色なので色をそのまま使用すればOK
               //反転色にするかは変更する可能性あり
@@ -604,11 +605,14 @@ document.addEventListener('DOMContentLoaded', function () {
   //「コンテキストの方はunselect後のstyle変更時に色変更」という処理をしている
   cy.on('select', 'node, edge', function (event) {
 
-    let rgb = ColorToHex(event.target.style('background-color'));
+
 
     if (event.target.group() === "nodes") {
+      let rgb = ColorToHex(event.target.style('background-color'));
       event.target.style('background-color', `${invertColor(rgb)}`);
+
     } else {
+      let rgb = ColorToHex(event.target.style('line-color'));
       event.target.style('line-color', `${invertColor(rgb)}`);
       event.target.style('target-arrow-color', `${invertColor(rgb)}`);
       event.target.style('source-arrow-color', `${invertColor(rgb)}`);
@@ -633,22 +637,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-  cy.on("unselect", function (event) {
-
-    let rgb = ColorToHex(event.target.style('background-color'));
+  cy.on("unselect", 'node, edge', function (event) {
 
     if (event.target.group() === "nodes") {
+      let rgb = ColorToHex(event.target.style('background-color'));
       event.target.style('background-color', `${invertColor(rgb)}`);
+
     } else {
+      let rgb = ColorToHex(event.target.style('line-color'));
       event.target.style('line-color', `${invertColor(rgb)}`);
       event.target.style('target-arrow-color', `${invertColor(rgb)}`);
       event.target.style('source-arrow-color', `${invertColor(rgb)}`);
     }
-    /*
-    event.target.style('line-color', 'blue');
-    event.target.style('target-arrow-color', 'blue');
-    event.target.style('source-arrow-color', 'blue');
-    */
+
   });
 
   //選択されたノードがフリーになった(selectの前)
