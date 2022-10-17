@@ -49,6 +49,8 @@ const cxt_new_node_generate = function (event) {
     },
     style: style
   });
+
+  MicroModal.close('cxt_node_create');
 }
 
 
@@ -92,6 +94,8 @@ const cxt_new_edge_generate = function (event) {
     },
     style: style
   });
+
+  MicroModal.close('cxt_edge_create');
 }
 
 
@@ -597,13 +601,39 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
       },
       {
+        id: 'change-node-parent',
+        content: 'parentをQメニューの値に変更',
+        tooltipText: 'copy-id-target',
+        selector: 'node',
+        hasTrailingDivider: true,
+        onClickFunction: function (event) {
+          let target = event.target || event.cyTarget;
+          target = target.move({
+            parent: `${qmenu_elem_parent.value}`
+          });
+        },
+      },
+      {
         id: 'change-elem-label',
-        content: '上の部分に入力したラベルに変更',
+        content: 'labelをQメニューの値に変更',
         tooltipText: 'select-label',
         selector: 'node, edge',
         onClickFunction: function (event) {
           let target = event.target || event.cyTarget;
           target.data('label', `${select_changelabel.value}`);
+        },
+      },
+      {
+        id: 'delete-node-parent',
+        content: 'parentをnullにして削除する',
+        tooltipText: 'copy-id-target',
+        selector: 'node',
+        hasTrailingDivider: true,
+        onClickFunction: function (event) {
+          let target = event.target || event.cyTarget;
+          target = target.move({
+            parent: null
+          });
         },
       },
 
