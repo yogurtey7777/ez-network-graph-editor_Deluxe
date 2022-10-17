@@ -510,7 +510,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     //共通の情報
-    //now_elem_group.value = event.target.group(); //要素は種類は固定
+    console.log(event.target.group());
+    now_elem_group.value = event.target.group(); //要素は種類は固定
     now_elem_id.value = event.target.data('id'); //idは変更不可能
     now_changelabel.value = event.target.data('label');
     now_pos_x.value = event.target.position('x');
