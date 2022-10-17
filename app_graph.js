@@ -98,6 +98,8 @@ const cxt_new_edge_generate = function (event) {
 
 //コンテキストメニューで色を変更する処理(ノード)
 const target_node_color_change = function (target, color) {
+
+  //呼び出す前に選択解除しているが一応判定する
   if (target.selected() === true) {
 
     //unselectで色反転が終了してから、
@@ -124,6 +126,8 @@ const target_node_color_change = function (target, color) {
 
 //コンテキストメニューで色を変更する処理(エッジ)
 const target_edge_color_change = function (target, color) {
+
+  //呼び出す前に選択解除しているが一応判定する
   if (target.selected() === true) {
 
     //unselectで色反転が終了してから、
@@ -285,6 +289,41 @@ document.addEventListener('DOMContentLoaded', function () {
           //モーダルウィンドウを表示する
           MicroModal.show('cxt_edge_create');
         }
+      },
+      {
+        id: 'copy-node',
+        content: 'ノードをコピー(idはランダム)',
+        tooltipText: 'copy-id-parent',
+        selector: 'node',
+        hasTrailingDivider: true,
+        onClickFunction: function (event) {
+          let target = event.target || event.cyTarget;
+          let target_c = target.copy();
+
+          let data = {
+            group: 'nodes',
+            id: `${Math.random().toString(32).substring(2)}`,
+            label: `${target.data('label')}`,
+            parent: null //親は無しにする
+          };
+
+          let pos = event.position || event.cyPosition;
+          let style = {
+            color: `${target.style('color')}`,
+            'background-color': `${target.style('background-color')}`,
+            shape: `${target.style('shape')}`
+          };
+          cy.add({
+            data: data,
+            position: {
+              x: pos.x,
+              y: pos.y + 10
+            },
+            style: style
+          });
+
+          //qmenu_elem_parent.value = target.data('id');
+        },
       },
       {
         id: 'copy-id-parent',
@@ -805,13 +844,13 @@ document.addEventListener('DOMContentLoaded', function () {
     /*色反転にしていたときのやつ
     if (event.target.group() === "nodes") {
       let rgb = ColorToHex(event.target.style('background-color'));
-      event.target.style('background-color', `${invertColor(rgb)}`);
+      event.target.style('background-color', `${ invertColor(rgb) }`);
 
     } else {
       let rgb = ColorToHex(event.target.style('line-color'));
-      event.target.style('line-color', `${invertColor(rgb)}`);
-      event.target.style('target-arrow-color', `${invertColor(rgb)}`);
-      event.target.style('source-arrow-color', `${invertColor(rgb)}`);
+      event.target.style('line-color', `${ invertColor(rgb) }`);
+      event.target.style('target-arrow-color', `${ invertColor(rgb) }`);
+      event.target.style('source-arrow-color', `${ invertColor(rgb) }`);
     }
     */
 
@@ -863,7 +902,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     //ノードかエッジかで何かするための部分(未実装)
-    // let now_elem_type_btn = document.querySelectorAll(`input[type='radio'][name='now_elem_type']`);
+    // let now_elem_type_btn = document.querySelectorAll(`input[type = 'radio'][name = 'now_elem_type']`);
     // if (elem_btn.id === 'now_elem_type_node') {
     //   //ノードの時の処理
     // } else {
@@ -1079,10 +1118,10 @@ const graphJsonSave = function () {
 
     //Styleを足す部分(node.jsonだとスタイル出ないため)
     node_json = node_json.slice(0, -1); //最後の},を一旦消す
-    node_json += `,"style":{`;
-    node_json += `"background-color":"${ColorToHex(node.style('background-color'))}",`
-    node_json += `"color":"${ColorToHex(node.style('color'))}",`
-    node_json += `"shape":"${node.style('shape')}"},`//最後の「}」忘れずに
+    node_json += `, "style": {`;
+    node_json += `"background-color": "${ColorToHex(node.style('background-color'))}", `
+    node_json += `"color": "${ColorToHex(node.style('color'))}", `
+    node_json += `"shape": "${node.style('shape')}"},`//最後の「}」忘れずに
 
     node_json += "},\n";
   });
@@ -1094,13 +1133,13 @@ const graphJsonSave = function () {
 
     //Styleを足す部分(node.jsonだとスタイル出ないため)
     edge_json = edge_json.slice(0, -1); //最後の},を一旦消す
-    edge_json += `,"style":{`;
-    edge_json += `"color":"${ColorToHex(edge.style('color'))}",`;
-    edge_json += `"line-color": "${ColorToHex(edge.style('line-color'))}",`;
-    edge_json += `"target-arrow-color": "${ColorToHex(edge.style('target-arrow-color'))}",`;
-    edge_json += `"target-arrow-shape":"${edge.style('target-arrow-shape')}",`
-    edge_json += `"source-arrow-color":"${ColorToHex(edge.style('source-arrow-color'))}",`;
-    edge_json += `"source-arrow-shape":"${edge.style('source-arrow-shape')}"},`;//最後の「}」忘れずに
+    edge_json += `, "style": {`;
+    edge_json += `"color": "${ColorToHex(edge.style('color'))}", `;
+    edge_json += `"line-color": "${ColorToHex(edge.style('line-color'))}", `;
+    edge_json += `"target-arrow-color": "${ColorToHex(edge.style('target-arrow-color'))}", `;
+    edge_json += `"target-arrow-shape": "${edge.style('target-arrow-shape')}", `
+    edge_json += `"source-arrow-color": "${ColorToHex(edge.style('source-arrow-color'))}", `;
+    edge_json += `"source-arrow-shape": "${edge.style('source-arrow-shape')}"},`;//最後の「}」忘れずに
 
     edge_json += "},\n";
   });
@@ -1132,7 +1171,6 @@ const graphJsonSave = function () {
 
 const graphJsonSave_ALL = function () {
 
-  //座標データのみ消さない
   //「.」は任意の1文字(改行以外)、「*?」は直前の繰り返し(最短)のもの、「|」で区切る
   const non_basic = /"removed":.*?,|"selected":.*?,|"selectable":.*?,|"locked":.*?,|"grabbable":.*?,|"pannable":.*?,/ig
 
@@ -1144,7 +1182,6 @@ const graphJsonSave_ALL = function () {
 
 const graphJsonSave_P = function () {
 
-  //座標データも消す
   //「.」は任意の1文字(改行以外)、「*?」は直前の繰り返し(最短)のもの、「|」で区切る
   const non_basic = /"removed":.*?,|"selected":.*?,|"selectable":.*?,|"locked":.*?,|"grabbable":.*?,|"pannable":.*?,/ig
 
