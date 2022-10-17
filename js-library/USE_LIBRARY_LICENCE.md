@@ -35,6 +35,8 @@ Copyright (c) 2019 iVis-at-Bilkent
 U. Dogrusoz , A. Karacelik, I. Safarli, H. Balci, L. Dervishi, and M.C. Siper, "Efficient methods and readily customizable libraries for managing complexity of large networks", PLoS ONE, 13(5): e0197238, 2018.
 <br><br><br>
 
+## ◎micromodal.min.js(https://github.com/Ghosh/micromodal)
+Copyright (c) 2017 Indrashish Ghosh
 
 # GPLv3のライブラリ
 ## ◎cytoscape-svg(https://github.com/kinimesi/cytoscape-svg)
