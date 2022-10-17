@@ -1,7 +1,100 @@
 "use strict";
 
+
+
+
 //インスペクタの表示中の要素のJSON
 let nowSelectedElemData;
+
+
+//コンテキストメニューのイベントをモーダルウィンドウに渡す用変数
+let cxt_event;
+
+//コンテキストメニュー→モーダルウィンドウで新規ノード作る処理
+const cxt_new_node_generate = function (event) {
+
+
+
+  let id_value = modal_node_id.value;
+  if (id_value === "") {
+    //idは空にできないので、適当な乱数を割り当てる
+    id_value = Math.random().toString(32).substring(2);
+  }
+
+  let parent_value = modal_node_parent.value;
+  if (parent_value === "") {
+    parent_value = null;
+  }
+
+  let data = {
+    group: 'nodes',
+    id: `${id_value}`,
+    label: `${modal_node_label.value}`,
+    parent: `${parent_value}`
+  };
+
+  let pos = event.position || event.cyPosition;
+
+  let style = {
+    color: `${modal_node_labelcolor.value}`,
+    'background-color': `${modal_node_backgroundcolor.value}`,
+    shape: `${modal_node_shape.value}`
+  }
+
+  cy.add({
+    data: data,
+    position: {
+      x: pos.x,
+      y: pos.y
+    },
+    style: style
+  });
+}
+
+
+//コンテキストメニュー→モーダルウィンドウで新規エッジ作る処理
+const cxt_new_edge_generate = function (event) {
+
+
+
+  let id_value = modal_edge_id.value;
+  if (id_value === "") {
+    //idは空にできないので、適当な乱数を割り当てる
+    id_value = Math.random().toString(32).substring(2);
+  }
+
+  let data = {
+    group: 'edges',
+    id: `${id_value}`,
+    source: `${modal_edge_source.value}`,
+    target: `${modal_edge_target.value}`,
+    label: `${modal_edge_label.value}`
+  };
+
+  let pos = event.position || event.cyPosition;
+
+  let style = {
+    color: `${modal_node_labelcolor.value}`,
+    'line-color': `${modal_edge_linecolor.value}`,
+    'target-arrow-color': `${modal_edge_t_arr_color.value}`,
+    'target-arrow-shape': `${modal_edge_t_arr_shape.value}`,
+    'source-arrow-color': `${modal_edge_s_arr_color.value}`,
+    'source-arrow-shape': `${modal_edge_s_arr_shape.value}`,
+    'background-color': `${modal_node_backgroundcolor.value}`,
+    shape: `${modal_node_shape.value}`
+  }
+
+  cy.add({
+    data: data,
+    position: {
+      x: pos.x,
+      y: pos.y
+    },
+    style: style
+  });
+}
+
+
 
 //コンテキストメニューで色を変更する処理(ノード)
 const target_node_color_change = function (target, color) {
@@ -60,12 +153,22 @@ const target_edge_color_change = function (target, color) {
 }
 
 
-
-
 //JSの読み込み早すぎてhtml関係の処理でエラー出るの回避するために
 //DOMコンテンツがロードされた時に発火をさせる。
 /*(重要)cytoscape.js関係のものもこれでやらないと動かない？*/
 document.addEventListener('DOMContentLoaded', function () {
+
+
+  //モーダルウィンドウの設定
+  MicroModal.init({
+    awaitOpenAnimation: true, //開くときのアニメーション
+    awaitCloseAnimation: true, //閉じるときのアニメーション
+    disableScroll: false,//モーダルを開いた時でもスクロールできるよう
+  });
+
+  //MicroModal.show('modal-id');
+  //MicroModal.close('modal-id');
+
 
   //cytoscape.jsのグラフの設定
   let cy = window.cy = cytoscape({
@@ -96,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
         selector: 'node',
         css: {
           'shape': 'rectangle',//四角形
-          'background-color': '#969998',//背景は灰色
+          'background-color': '#9dbaea',//背景は
           'content': 'data(label)',//文字はラベルの内容
           'text-valign': 'center',//文字を中央に配置
           'text-halign': 'center',//文字を中央に配置
@@ -119,8 +222,8 @@ document.addEventListener('DOMContentLoaded', function () {
           'width': 4,//普通の幅の線
           'content': 'data(label)', //ノードに表示するのはラベルの値
           'target-arrow-shape': 'triangle',//エッジの先端の形状
-          'line-color': '#9dbaea',//エッジの色
-          'target-arrow-color': '#9dbaea',//エッジの先端の色
+          'line-color': '#DA1725',//エッジの色
+          'target-arrow-color': '#DA1725',//エッジの先端の色
           'curve-style': `${edge_curve.value}`//選択後にページ更新で変わるように
         }
       },
@@ -152,35 +255,18 @@ document.addEventListener('DOMContentLoaded', function () {
         content: '上部分の設定で新規ノード作る',
         tooltipText: 'add node',
         coreAsWell: true,
+        hasTrailingDivider: true,
         onClickFunction: function (event) {
 
-          let id_value = qmenu_elem_id.value;
-          if (id_value === "") {
-            //idは空にできないので、適当な乱数を割り当てる
-            id_value = Math.random().toString(32).substring(2);
-          }
+          //クイックメニューの値をモーダルウィンドウにわたす
+          modal_node_parent.value = qmenu_elem_parent.value;
 
-          let parent_value = qmenu_elem_parent.value;
-          if (parent_value === "") {
-            parent_value = null;
-          }
+          //イベントをモーダルウィンドウに渡す
+          cxt_event = event;
 
-          let data = {
-            group: 'nodes',
-            id: `${id_value}`,
-            label: `${qmenu_elem_label.value}`,
-            parent: `${parent_value}`
-          };
+          //モーダルウィンドウを表示する
+          MicroModal.show('cxt_node_create');
 
-          let pos = event.position || event.cyPosition;
-
-          cy.add({
-            data: data,
-            position: {
-              x: pos.x,
-              y: pos.y
-            }
-          });
         }
       },
       {
@@ -188,43 +274,52 @@ document.addEventListener('DOMContentLoaded', function () {
         content: '上部分の設定で新エッジ作る',
         tooltipText: 'add node',
         coreAsWell: true,
+        hasTrailingDivider: true,
         onClickFunction: function (event) {
 
-          let id_value = qmenu_elem_id.value;
-          if (id_value === "") {
-            //idは空にできないので、適当な乱数を割り当てる
-            id_value = Math.random().toString(32).substring(2);
-          }
+          modal_edge_source.value = qmenu_elem_source.value;
+          modal_edge_target.value = qmenu_elem_target.value;
 
-          var data = {
-            group: 'edges',
-            id: `${id_value}`,
-            source: `${qmenu_elem_source.value}`,
-            target: `${qmenu_elem_target.value}`,
-            label: `${qmenu_elem_id.value}`
-          };
-
-          var pos = event.position || event.cyPosition;
-
-          cy.add({
-            data: data,
-            position: {
-              x: pos.x,
-              y: pos.y
-            }
-          });
+          //イベントをモーダルウィンドウに渡す
+          cxt_event = event;
+          //モーダルウィンドウを表示する
+          MicroModal.show('cxt_edge_create');
         }
       },
       {
-        id: 'change-elem-label',
-        content: '上の部分に入力したラベルに変更',
-        tooltipText: 'select-label',
-        selector: 'node, edge',
+        id: 'copy-id-parent',
+        content: 'Qメニューのparentにidコピー',
+        tooltipText: 'copy-id-parent',
+        selector: 'node',
+        hasTrailingDivider: true,
         onClickFunction: function (event) {
           let target = event.target || event.cyTarget;
-          target.data('label', `${select_changelabel.value}`);
+          qmenu_elem_parent.value = target.data('id');
         },
       },
+      {
+        id: 'copy-id-source',
+        content: 'Qメニューのsourceにidコピー',
+        tooltipText: 'copy-id-source',
+        selector: 'node',
+        hasTrailingDivider: true,
+        onClickFunction: function (event) {
+          let target = event.target || event.cyTarget;
+          qmenu_elem_source.value = target.data('id');
+        },
+      },
+      {
+        id: 'copy-id-target',
+        content: 'Qメニューのtargetにidコピー',
+        tooltipText: 'copy-id-target',
+        selector: 'node',
+        hasTrailingDivider: true,
+        onClickFunction: function (event) {
+          let target = event.target || event.cyTarget;
+          qmenu_elem_target.value = target.data('id');
+        },
+      },
+
       {
         //右クリックからノードの色を変更する
         //ここでの色変更は一時的なものなので、保存時のJSONには反映されない
@@ -239,6 +334,7 @@ document.addEventListener('DOMContentLoaded', function () {
             id: 'selecting_color',
             content: '上の部分で選択した色に変更',
             tooltipText: 'select-color',
+            hasTrailingDivider: true,
             onClickFunction: function (event) {
 
               let target = event.target || event.cyTarget;
@@ -249,6 +345,7 @@ document.addEventListener('DOMContentLoaded', function () {
             id: 'reverse_color-node',
             content: '現在の色を反転させる',
             tooltipText: 'select-color',
+            hasTrailingDivider: true,
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
               let rgb = ColorToHex(event.target.style('background-color'));
@@ -266,6 +363,7 @@ document.addEventListener('DOMContentLoaded', function () {
             id: 'color-light-gray',
             content: 'ライトグレー',
             tooltipText: 'light-gray',
+            hasTrailingDivider: true,
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
               target_node_color_change(target, '#969998');
@@ -284,6 +382,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 id: 'color-light-blue',
                 content: 'ライトブルー',
                 tooltipText: 'light blue',
+                hasTrailingDivider: true,
                 onClickFunction: function (event) {
                   let target = event.target || event.cyTarget;
                   target_node_color_change(target, 'lightblue');
@@ -294,6 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 id: 'color-dark-blue',
                 content: 'ダークブルー',
                 tooltipText: 'dark blue',
+                hasTrailingDivider: true,
                 onClickFunction: function (event) {
                   let target = event.target || event.cyTarget;
                   target_node_color_change(target, 'darkblue');
@@ -305,6 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
             id: 'color-green',
             content: 'グリーン',
             tooltipText: 'green',
+            hasTrailingDivider: true,
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
               target_node_color_change(target, 'green');
@@ -342,6 +443,7 @@ document.addEventListener('DOMContentLoaded', function () {
             id: 'reverse_color-edge',
             content: '現在の色を反転させる',
             tooltipText: 'select-color',
+            hasTrailingDivider: true,
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
               let rgb = ColorToHex(event.target.style('line-color'));
@@ -414,6 +516,16 @@ document.addEventListener('DOMContentLoaded', function () {
             },
           },
         ]
+      },
+      {
+        id: 'change-elem-label',
+        content: '上の部分に入力したラベルに変更',
+        tooltipText: 'select-label',
+        selector: 'node, edge',
+        onClickFunction: function (event) {
+          let target = event.target || event.cyTarget;
+          target.data('label', `${select_changelabel.value}`);
+        },
       },
 
       {
@@ -517,9 +629,17 @@ document.addEventListener('DOMContentLoaded', function () {
     now_changelabel.value = event.target.data('label');
     now_pos_x.value = event.target.position('x');
     now_pos_y.value = event.target.position('y');
-    now_labelcolor.value = ColorToHex(event.target.style('color'));
-    now_labelcolor_str.value = ColorToHex(event.target.style('color'));
 
+    if (event.target.selected() === true) {
+      //選択されてる＝背景色変わってるのでインスペクタに反映はしない
+    }
+    else {
+      now_labelcolor.value = ColorToHex(event.target.style('color'));
+      now_labelcolor_str.value = ColorToHex(event.target.style('color'));
+    }
+
+
+    //ノードだけの情報
     if (event.target.group() === "nodes") {
 
       now_elem_type_node.checked = true;
@@ -528,8 +648,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
       //ノードだけの情報をインスペクタに反映する
       now_parent.value = event.target.data('parent');
-      now_backgroundcolor.value = ColorToHex(event.target.style('background-color'));
-      now_backgroundcolor_str.value = ColorToHex(event.target.style('background-color'));
+
+      if (event.target.selected() === true) {
+        //選択されてる＝背景色変わってるのでインスペクタに反映はしない
+      }
+      else {
+        now_backgroundcolor.value = ColorToHex(event.target.style('background-color'));
+        now_backgroundcolor_str.value = ColorToHex(event.target.style('background-color'));
+      }
       now_shape.value = event.target.style('shape');
 
       now_source.value = "";
@@ -557,14 +683,23 @@ document.addEventListener('DOMContentLoaded', function () {
       //エッジだけの情報をインスペクタに反映する
       now_source.value = event.target.data('source');
       now_target.value = event.target.data('target');
-      now_linecolor.value = ColorToHex(event.target.style('line-color'));
-      now_linecolor_str.value = ColorToHex(event.target.style('line-color'));
-      now_t_arr_color.value = ColorToHex(event.target.style('target-arrow-color'));
-      now_t_arr_color_str.value = ColorToHex(event.target.style('target-arrow-color'));
+
+
       now_t_arr_shape.value = event.target.style('target-arrow-shape');
-      now_s_arr_color.value = ColorToHex(event.target.style('source-arrow-color'));
-      now_s_arr_color_str.value = ColorToHex(event.target.style('source-arrow-color'));
       now_s_arr_shape.value = event.target.style('source-arrow-shape');
+      if (event.target.selected() === true) {
+        //選択されてる＝背景色変わってるのでインスペクタに反映はしない
+      }
+      else {
+        now_linecolor.value = ColorToHex(event.target.style('line-color'));
+        now_linecolor_str.value = ColorToHex(event.target.style('line-color'));
+        now_t_arr_color.value = ColorToHex(event.target.style('target-arrow-color'));
+        now_t_arr_color_str.value = ColorToHex(event.target.style('target-arrow-color'));
+        now_s_arr_color.value = ColorToHex(event.target.style('source-arrow-color'));
+        now_s_arr_color_str.value = ColorToHex(event.target.style('source-arrow-color'));
+      }
+
+
     }
 
 
@@ -701,6 +836,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 });
+
+
+
 
 
 
@@ -957,10 +1095,10 @@ const graphJsonSave_P = function () {
 
   //座標データも消す
   //「.」は任意の1文字(改行以外)、「*?」は直前の繰り返し(最短)のもの、「|」で区切る
-  const non_basic = /"position":.*?},|"removed":.*?,|"selected":.*?,|"selectable":.*?,|"locked":.*?,|"grabbable":.*?,|"pannable":.*?,/ig
+  const non_basic = /"removed":.*?,|"selected":.*?,|"selectable":.*?,|"locked":.*?,|"grabbable":.*?,|"pannable":.*?,/ig
 
   let s = graphJsonSave();
-  s = s.replaceAll(non_basic, '');
+  s = s.replaceAll(non_basic, '').replaceAll(/,\n*]/g, "\n]");;
 
   $("#SaveJsonData").val(s);
 
@@ -982,6 +1120,34 @@ const graphJsonFileSave = function () {
 }
 
 
+const chamgeElemJson_handle = function () {
+  if (nowSelectedElemData.selected() === true) {
+
+    //unselectで色反転が終了してから、
+    // one(一回限り)にしないとtargetの選択が外される度に発動するので注意
+    //https://js.cytoscape.org/#cy.one
+    nowSelectedElemData.one('unselect', function () {
+
+      //targetのスタイルのどれかの値が変更されたら(超重要なイベントです)
+      //https://js.cytoscape.org/#events/collection-events
+      //＝色反転が終了したら
+      nowSelectedElemData.one('style', function () {
+        //プロパティを変更する
+        changeElemJson();
+      });
+
+    });
+  } else {
+
+    //普通の場合は普通にそのまま処理すればいい
+    changeElemJson();
+
+  }
+}
+
+
+
+//インスペクタ上から要素を編集する
 const changeElemJson = function () {
 
   //共通の情報
@@ -1049,8 +1215,15 @@ const changeElemJson = function () {
     //ColorToHex(nowSelectedElemData.style('source-arrow-color', now_s_arr_color_str.value));
     nowSelectedElemData.style('source-arrow-shape', `${now_s_arr_shape.value}`);
   } else {
-
+    console.log("error");
   }
+}
+
+
+const reset_qmenu_generate_conf = function () {
+  qmenu_elem_parent.value = "";
+  qmenu_elem_source.value = "";
+  qmenu_elem_target.value = "";
 }
 
 //ページを更新する直前の処理

@@ -31,6 +31,7 @@
 
   <!-- モーダルウィンドウのライブラリ -->
   <script src="js-library\micromodal.min.js"></script>
+  <link rel="stylesheet" href="css-library\micromodal.css">
 
   <!-- 自分が作ったスクリプト -->
   <script src="app_graph.js"></script>
@@ -157,9 +158,9 @@
           <details>
             <summary>JSONの保存</summary>
             <!-- JSONの保存-->
-            <p>【メモ】：ケツカンマを消すか消さないかのラジオボタン入れる</p>
-            <button id="IdBtnSave" onclick="graphJsonSave_ALL()">全部のデータ保存する</button>
-            <button id="IdBtnSave_P" onclick="graphJsonSave_P()">基本のデータだけ保存</button><br>
+            <p>ケツカンマが削除されていないJSONは、<br>処理しないとJSON.parseで読んだ時にエラー出る</p>
+            <button id="IdBtnSave" onclick="graphJsonSave_ALL()">ケツカンマそのまま保存</button>
+            <button id="IdBtnSave_P" onclick="graphJsonSave_P()">ケツカンマ削除して保存</button><br>
             <textarea id="SaveJsonData" cols="30" rows="10"></textarea><br>
             <button onclick="graphJsonCopy(`SaveJsonData`)">クリップボードにコピー</button><br><br>
             <input type="text" id="JsonData_filename" value="test" style="width:50px;" />
@@ -178,7 +179,7 @@
     <summary>インスペクター＆エッジとノードを編集する機能</summary>
 
     :左クリックしたノード/エッジの情報を表示＋編集
-    <button onclick="changeElemJson()">ここをクリックで以下の設定を反映する</button><br><br><br>
+    <button onclick="chamgeElemJson_handle()">ここをクリックで以下の設定を反映する</button><br>
 
 
     <table border="1">
@@ -254,10 +255,10 @@
               <option value="chevron">chevron</option>
             </select><br>
             source-arrow-color：<input type="color" id="now_s_arr_color" value="#000000">
-            <input type="color" id="now_s_arr_color_str" value="#000000"><br>
+            <input type="text" id="now_s_arr_color_str" value="#000000"><br>
             source-arrow-shape：<select id="now_s_arr_shape">
-              <option value="none">none</option>
-              <option value="triangle" selected>triangle</option>
+              <option value="none" selected>none</option>
+              <option value="triangle">triangle</option>
               <option value="triangle-tee">triangle-tee</option>
               <option value="circle-triangle">circle-triangle</option>
               <option value="triangle-cross">triangle-cross</option>
@@ -273,7 +274,7 @@
         </td>
       </tr>
 
-    </table><br><br>
+    </table>
   </details>
   <table border="1">
     <tr>
@@ -284,11 +285,11 @@
     </tr>
     <tr>
       <td>
-        右クリで新規作成するノード/エッジのラベル：<input type="text" id="qmenu_elem_label" value="" style="width:85px;">
-        id(重複不可,後で変更不可)：<input type="text" id="qmenu_elem_id" value="" style="width:85px;"><br>
+
         [ノードのみ]parentのid：<input type="text" id="qmenu_elem_parent" value="" style="width:85px;">
         [エッジのみ]sourceのid：<input type="text" id="qmenu_elem_source" value="" style="width:85px;">
         targetのid：<input type="text" id="qmenu_elem_target" value="" style="width:85px;">
+        <button onclick="reset_qmenu_generate_conf()">値をリセット</button>
       </td>
     </tr>
     <tr>
@@ -302,8 +303,8 @@
         <!-- レイアウト指定-->
         ノードの配置[<a href="https://js.cytoscape.org/#layouts" target="_blank">レイアウト</a>]を選択(<b>位置変更したの消えるので注意</b>)
         <select id="selectLayout">
-          <option value="null">null(レイアウト無し、全部0,0)</option>
-          <option value="dagre" selected>dagre(階層構造にする、おすすめ)</option>
+          <option value="null" selected>null(レイアウト無し、全部0,0)</option>
+          <option value="dagre">dagre(階層構造にする、おすすめ)</option>
           <option value="grid">grid(グリッド状にする、おすすめ)</option>
           <option value="random">random(文字通り、ランダム)</option>
           <option value="circle">circle(サークル状にする)</option>
@@ -342,6 +343,161 @@
   <input type="hidden" value="1" id="cy_zoom">
   <input type="hidden" value="0" id="cy_pan_x">
   <input type="hidden" value="0" id="cy_pan_y">
+
+  <!--  -->
+  <!--  -->
+  <!--  -->
+  <!--  -->
+  <!--  -->
+  <!--  -->
+  <!--  -->
+  <!--  -->
+  <!--  -->
+  <!-- ここより下は、右クリックのノード編集機能で使用するモーダルメニューの領域である -->
+  <!--  https://pengi-n.co.jp/blog/js-micromodal/#i-7-->
+  <!--  -->
+  <!-- css-library\micromodal.cssの各項目にz-indexを指定しないとcytoscape.jsと要素被ります -->
+  <!-- これはサンプルのやつ →モーダルウィンドウ作成の雛形 -->
+  <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            Micromodal
+          </h2>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+        </header>
+        <main class="modal__content" id="modal-1-content">
+          <p>
+            Try hitting the <code>tab</code> key and notice how the focus stays within the modal itself. Also,
+            <code>esc</code> to close modal.
+          </p>
+        </main>
+        <footer class="modal__footer">
+          <button class="modal__btn modal__btn-primary">Continue</button>
+          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- 開くボタン -->
+  <button data-micromodal-trigger="modal-1">モーダルウィンドウテストのボタン</button>
+
+  <!-- コンテキストメニュー→新規ノード作成で開くモーダルウィンドウ -->
+  <div class="modal micromodal-slide" id="cxt_node_create" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            新規ノードを作るモーダルウィンドウです。
+          </h2>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+        </header>
+        <main class="modal__content" id="modal-1-content">
+          id(重複不可,後で変更不可)：<input type="text" id="modal_node_id" value="" style="width:85px;"><br>
+          ノードのラベル：<input type="text" id="modal_node_label" value="" style="width:85px;"><br>
+          color(labelの色)：<input type="color" id="modal_node_labelcolor" value="#000000"><br><br>
+          parentのid：<input type="text" id="modal_node_parent" value="" style="width:85px;"><br>
+          parent：<input type="text" id="modal_node_parent"><br><br>
+          background-color：<br><input type="color" id="modal_node_backgroundcolor" value="#000000">
+          <input type="text" id="modal_node_backgroundcolor_str" style="width:55px;"><br><br>
+          shape：<select id="modal_node_shape">
+            <option value="ellipse">ellipse</option>
+            <option value="triangle">triangle</option>
+            <option value="round-triangle">round-triangle</option>
+            <option value="rectangle" selected>rectangle</option>
+            <option value="round-rectangle">round-rectangle</option>
+            <option value="barrel">barrel</option>
+            <option value="rhomboid">rhomboid</option>
+            <option value="diamond">diamond</option>
+            <option value="round-diamond">round-diamond</option>
+            <option value="pentagon">round-pentagon</option>
+            <option value="round-pentagon">round-pentagon</option>
+            <option value="hexagon">hexagon</option>
+            <option value="round-hexagon">round-hexagon</option>
+            <option value="heptagon">heptagon</option>
+            <option value="round-heptagon">round-heptagon</option>
+            <option value="octagon">octagon</option>
+            <option value="round-octagon">round-octagon</option>
+            <option value="star">star</option>
+            <option value="tag">tag</option>
+            <option value="round-tag">round-tag</option>
+            <option value="vee">vee</option>
+          </select><br>
+        </main>
+        <footer class="modal__footer">
+          <button class="modal__btn modal__btn-primary"
+            onclick="cxt_new_node_generate(cxt_event)">ノード作成するボタンテスト</button>
+          <button class="modal__btn" data-micromodal-close
+            aria-label="Close this dialog window">やっぱりやめる(ESCでも可)</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- コンテキストメニュー→新規エッジ作成で開くモーダルウィンドウ -->
+  <div class="modal micromodal-slide" id="cxt_edge_create" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            新規ノードを作るモーダルウィンドウです。
+          </h2>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+        </header>
+        <main class="modal__content" id="modal-1-content">
+          id(重複不可,後で変更不可)：<input type="text" id="modal_edge_id" value="" style="width:85px;"><br>
+          ノードのラベル：<input type="text" id="modal_edge_label" value="" style="width:85px;"><br>
+          color(labelの色)：<input type="color" id="modal_edge_labelcolor" value="#000000"><br><br>
+          source：<input type="text" id="modal_edge_source" value="" style="width:55px;">
+          target：<input type="text" id="modal_edge_target" value="" style="width:55px;"><br>
+          line-color：<input type="color" id="modal_edge_linecolor" value="#000000">
+          <input type="text" id="modal_edge_linecolor_str" value="#000000" style="width:55px;"><br><br>
+          target-arrow-color：<input type="color" id="modal_edge_t_arr_color" value="#000000">
+          <input type="text" id="modal_edge_t_arr_color_str" value="#000000" style="width:55px;"><br>
+          target-arrow-shape：<select id="modal_edge_t_arr_shape">
+            <option value="none">none</option>
+            <option value="triangle" selected>triangle</option>
+            <option value="triangle-tee">triangle-tee</option>
+            <option value="circle-triangle">circle-triangle</option>
+            <option value="triangle-cross">triangle-cross</option>
+            <option value="triangle-backcurve">triangle-backcurve</option>
+            <option value="vee">vee</option>
+            <option value="tee">tee</option>
+            <option value="square">square</option>
+            <option value="circle">circle</option>
+            <option value="diamond">diamond</option>
+            <option value="chevron">chevron</option>
+          </select><br>
+          source-arrow-color：<input type="color" id="modal_edge_s_arr_color" value="#000000">
+          <input type="text" id="modal_edge_s_arr_color_str" value="#000000"><br>
+          source-arrow-shape：<select id="modal_edge_s_arr_shape">
+            <option value="none" selected>none</option>
+            <option value="triangle">triangle</option>
+            <option value="triangle-tee">triangle-tee</option>
+            <option value="circle-triangle">circle-triangle</option>
+            <option value="triangle-cross">triangle-cross</option>
+            <option value="triangle-backcurve">triangle-backcurve</option>
+            <option value="vee">vee</option>
+            <option value="tee">tee</option>
+            <option value="square">square</option>
+            <option value="circle">circle</option>
+            <option value="diamond">diamond</option>
+            <option value="chevron">chevron</option>
+          </select><br>
+        </main>
+        <footer class="modal__footer">
+          <button class="modal__btn modal__btn-primary"
+            onclick="cxt_new_edge_generate(cxt_event)">ノード作成するボタンテスト</button>
+          <button class="modal__btn" data-micromodal-close
+            aria-label="Close this dialog window">やっぱりやめる(ESCでも可)</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+
 
 </body>
 

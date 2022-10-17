@@ -71,6 +71,7 @@ code {
   /*画面の50%まで伸びる*/
   height: 50vh;
 
+  z-index: 1;
   background-color: #e6ffe6;
   border: 1px solid #949494;
   overflow: hidden;
