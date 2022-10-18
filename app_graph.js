@@ -1444,10 +1444,17 @@ const changeElemJson = function () {
 }
 
 
+//クイックメニューの値を消す
 const reset_qmenu_generate_conf = function () {
   qmenu_elem_parent.value = "";
   qmenu_elem_source.value = "";
   qmenu_elem_target.value = "";
+}
+
+
+//レイアウトを変更するボタンの処理
+const change_cy_edge_layout = function () {
+  cy.style().selector('edge').style('curve-style', `${edge_curve.value}`).update();
 }
 
 //ページを更新する直前の処理
