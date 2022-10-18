@@ -385,6 +385,39 @@ document.addEventListener('DOMContentLoaded', function () {
           },
           {
             id: 'reverse_color-node',
+            content: '現在の色の補色にする',
+            tooltipText: 'select-color',
+            hasTrailingDivider: true,
+            onClickFunction: function (event) {
+              let target = event.target || event.cyTarget;
+
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
+              let rgb = ColorToHex(target.style('background-color'));
+
+              //選択の状態が解除されて選択色から元の色に戻った時点で色を反転させる
+              if (target.selected() === true) {
+                console.log("bug");
+                target.one('unselect', function (event) {
+                  //targetのスタイルのどれかの値が変更されたら(超重要なイベントです)
+                  //https://js.cytoscape.org/#events/collection-events
+                  //＝選択による色変更が終了したら
+
+                  target.one('style', function () {
+                    //色を変更する
+                    rgb = ColorToHex(target.style('background-color'));
+                    target.style('background-color', `${compleColor(rgb)}`);
+                  });
+
+
+                });
+              } else {
+                //選択されてない場合は、普通にそのまま判定させればOK
+                target_node_color_change(target, `${compleColor(rgb)}`);
+              }
+            },
+          },
+          {
+            id: 'reverse_color-node',
             content: '現在の色を反転させる',
             tooltipText: 'select-color',
             hasTrailingDivider: true,
@@ -416,6 +449,7 @@ document.addEventListener('DOMContentLoaded', function () {
               }
             },
           },
+
           {
             id: 'color-light-gray',
             content: 'ライトグレー',
@@ -505,6 +539,40 @@ document.addEventListener('DOMContentLoaded', function () {
           },
           {
             id: 'reverse_color-edge',
+            content: '現在の色の補色にする',
+            tooltipText: 'select-color',
+            hasTrailingDivider: true,
+            onClickFunction: function (event) {
+              let target = event.target || event.cyTarget;
+              target.unselect(); //選択を解除する(選択の色変更との競合防ぐ)
+              let rgb = ColorToHex(target.style('line-color'));
+
+
+              //選択の状態が解除されて選択色から元の色に戻った時点で色を反転させる
+              if (target.selected() === true) {
+                target.one('unselect', function () {
+                  //targetのスタイルのどれかの値が変更されたら(超重要なイベントです)
+                  //https://js.cytoscape.org/#events/collection-events
+                  //＝選択による色変更が終了したら
+                  target.one('style', function () {
+
+                    //色を変更する
+                    rgb = ColorToHex(target.style('line-color'));
+                    target.style('line-color', `${compleColor(rgb)}`);
+                    target.style('target-arrow-color', `${compleColor(rgb)}`);
+                    target.style('source-arrow-color', `${compleColor(rgb)}`);
+                  });
+
+                });
+              } else {
+                //選択されてない場合は、普通にそのまま判定させればOK
+                target_edge_color_change(target, `${compleColor(rgb)}`);
+
+              }
+            },
+          },
+          {
+            id: 'reverse_color-edge',
             content: '現在の色を反転させる',
             tooltipText: 'select-color',
             hasTrailingDivider: true,
@@ -537,6 +605,7 @@ document.addEventListener('DOMContentLoaded', function () {
               }
             },
           },
+
           {
             id: 'color-light-gray',
             content: 'ライトグレー',
@@ -988,6 +1057,7 @@ function ColorToHex(color) {
   return resultHex;
 }
 
+
 //HEXの色を反転してリターンする
 //"#000000"の文字列にのみ対応
 //https://www.web-dev-qa-db-ja.com/ja/javascript/823691380/
@@ -996,16 +1066,46 @@ function invertColor(hex) {
   hex = hex.slice(1);
 
   if (hex.indexOf('#') === 0) {
-    hex = hex.slice(1);
+    hex = hex.slice(1); //最初の#を消す
   }
 
-  // RGBに変換して、256から引いたものが反転色＆再度HEXに変換
+  // RGBに変換して、255から引いたものが反転色＆再度HEXに変換
   let r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16);
   let g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16);
   let b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
 
-  // pad each with zeros and return
+  // 長さがゼロだった場合は左側に0をつける
   return '#' + padZero(r) + padZero(g) + padZero(b);
+}
+
+
+//HEXの色を補色にしてリターンする
+//"#000000"の文字列にのみ対応
+//https://q-az.net/complementary-color-javascript/
+function compleColor(hex) {
+
+  hex = hex.slice(1);
+
+  if (hex.indexOf('#') === 0) {
+    hex = hex.slice(1); //最初の#を消す
+  }
+
+  // HEXをRGBに変換する
+  //.toString(16)
+  let r = (parseInt(hex.slice(0, 2), 16));
+  let g = (parseInt(hex.slice(2, 4), 16));
+  let b = (parseInt(hex.slice(4, 6), 16));
+
+  let max = Math.max(r, Math.max(g, b));//RGBの最大値
+  let min = Math.min(r, Math.min(g, b));//RGBの最小値
+  let sum = max + min;
+
+  let comp_r = (Math.abs(r - sum)).toString(16); //引いてから絶対値にして変換
+  let comp_g = (Math.abs(g - sum)).toString(16); //引いてから絶対値にして変換
+  let comp_b = (Math.abs(b - sum)).toString(16); //引いてから絶対値にして変換
+
+  // 長さがゼロだった場合は左側に0をつける
+  return '#' + padZero(comp_r) + padZero(comp_g) + padZero(comp_b);
 }
 
 function padZero(hex_part) {
@@ -1113,6 +1213,8 @@ const readGraphJson = function () {
   //JSONにケツカンマがあった場合は削除する。
   const load_data = (LoadJsonData.value).replaceAll(",}", "}").replaceAll(/,\n*]/g, "\n]");
   console.log(load_data)
+
+
   cy.add(JSON.parse(load_data));
 };
 
@@ -1210,13 +1312,14 @@ const graphJsonSave_ALL = function () {
   $("#SaveJsonData").val(s);
 }
 
+//ケツカンマを消して保存
 const graphJsonSave_P = function () {
 
   //「.」は任意の1文字(改行以外)、「*?」は直前の繰り返し(最短)のもの、「|」で区切る
   const non_basic = /"removed":.*?,|"selected":.*?,|"selectable":.*?,|"locked":.*?,|"grabbable":.*?,|"pannable":.*?,/ig
 
   let s = graphJsonSave();
-  s = s.replaceAll(non_basic, '').replaceAll(/,\n*]/g, "\n]");;
+  s = s.replaceAll(non_basic, '').replaceAll(",}", "}").replaceAll(/,\n*]/g, "\n]");;
 
   $("#SaveJsonData").val(s);
 
@@ -1348,18 +1451,22 @@ const reset_qmenu_generate_conf = function () {
 }
 
 //ページを更新する直前の処理
-window.addEventListener('beforeunload', function () {
+window.addEventListener('beforeunload', function (event) {
 
 
   //現在表示されているグラフのJSONを更新後の画面に持っていくために
   //hiddenのinputに値を保存しておく
-  //これの時点では余計な改行は入らないので、置き換えに正規表現は使わない
+  //これの時点では余計な改行は入らないので、置き換えに正規表現は使 わない
+
+
+
   HiddenNowJsonData.value = graphJsonSave().replaceAll(",}", "}").replaceAll(",\n]", "\n]");
   //ズーム倍率とパンの座標も同じhiddenに保存する
 
   cy_zoom.value = cy.zoom();//文字列なので後でIntに変換
   cy_pan_x.value = cy.pan('x');//文字列なので後でfloatに変換
   cy_pan_y.value = cy.pan('y');//文字列なので後でfloatに変換
+
   /*
   now_json = graphJsonSave();
   console.log("testetetetetete")
@@ -1385,6 +1492,8 @@ window.addEventListener('load', function () {
   //JSON.parse(HiddenNowJsonData.value)
 
   //JSON.parseでエラー出たらコンソール確認する
+
+
   cy.add(JSON.parse(HiddenNowJsonData.value));
   //cy.remove(elements);
   //cy.add(eval($("#LoadJsonData").val()));
