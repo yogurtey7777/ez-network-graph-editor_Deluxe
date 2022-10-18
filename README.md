@@ -35,7 +35,7 @@
 ライセンス情報は以下のマークダウンにまとめて書きました。  
 
 
-<span style="font-size: 300%;">[USE_LIBRARY_LICENCE.md](https://github.com/yogurt1234/ez-network-graph-editor_Deluxe/blob/main/js-library/USE_LIBRARY_LICENCE.md) </span>  
+<span style="font-size: 300%;">[USE_LIBRARY_LICENCE.md](https://github.com/yogurtey7777/ez-network-graph-editor_Deluxe/blob/main/js-library/USE_LIBRARY_LICENCE.md) </span>  
 
 <br><br>
 
