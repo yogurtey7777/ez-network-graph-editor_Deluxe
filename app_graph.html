@@ -395,13 +395,16 @@
           <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
         </header>
         <main class="modal__content" id="modal-1-content">
-          id(重複不可,後で変更不可)：<input type="text" id="modal_node_id" value="" style="width:85px;"><br>
-          ノードのラベル：<input type="text" id="modal_node_label" value="" style="width:85px;"><br>
-          color(labelの色)：<input type="color" id="modal_node_labelcolor" value="#000000"><br><br>
-          parentのid：<input type="text" id="modal_node_parent" value="" style="width:85px;"><br><br>
-          background-color：<br><input type="color" id="modal_node_backgroundcolor" value="#000000">
+          🔘id(重複不可,後で変更不可)：<input type="text" id="modal_node_id" value="" style="width:85px;"><br>
+          　※idを空白にするとランダム文字列にする<br><br>
+          🔘ノードのラベル：<input type="text" id="modal_node_label" value="" style="width:85px;"><br>
+          🔘color(labelの色)：<input type="color" id="modal_node_labelcolor" value="#000000">
+          <input type="text" id="modal_node_labelcolor_str" value="#000000" style="width:55px;"><br><br><br>
+          🔘parentのid：<input type="text" id="modal_node_parent" value="" style="width:85px;"><br>
+          　※ここの値はQメニューと同期される<br><br>
+          🔘background-color：<br><input type="color" id="modal_node_backgroundcolor" value="#9dbaea">
           <input type="text" id="modal_node_backgroundcolor_str" style="width:55px;"><br><br>
-          shape：<select id="modal_node_shape">
+          🔘shape：<select id="modal_node_shape">
             <option value="ellipse">ellipse</option>
             <option value="triangle">triangle</option>
             <option value="round-triangle">round-triangle</option>
@@ -426,8 +429,7 @@
           </select><br>
         </main>
         <footer class="modal__footer">
-          <button class="modal__btn modal__btn-primary"
-            onclick="cxt_new_node_generate(cxt_event)">ノード作成するボタンテスト</button>
+          <button class="modal__btn modal__btn-primary" onclick="cxt_new_node_generate(cxt_event)">新規ノードを作成する</button>
           <button class="modal__btn" data-micromodal-close
             aria-label="Close this dialog window">やっぱりやめる(ESCでも可)</button>
         </footer>
@@ -447,16 +449,19 @@
           <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
         </header>
         <main class="modal__content" id="modal-1-content">
-          id(重複不可,後で変更不可)：<input type="text" id="modal_edge_id" value="" style="width:85px;"><br>
-          ノードのラベル：<input type="text" id="modal_edge_label" value="" style="width:85px;"><br>
-          color(labelの色)：<input type="color" id="modal_edge_labelcolor" value="#000000"><br><br>
-          source：<input type="text" id="modal_edge_source" value="" style="width:55px;">
-          target：<input type="text" id="modal_edge_target" value="" style="width:55px;"><br>
-          line-color：<input type="color" id="modal_edge_linecolor" value="#000000">
-          <input type="text" id="modal_edge_linecolor_str" value="#000000" style="width:55px;"><br><br>
-          target-arrow-color：<input type="color" id="modal_edge_t_arr_color" value="#000000">
-          <input type="text" id="modal_edge_t_arr_color_str" value="#000000" style="width:55px;"><br>
-          target-arrow-shape：<select id="modal_edge_t_arr_shape">
+          🔘id(重複不可,後で変更不可)：<input type="text" id="modal_edge_id" value="" style="width:85px;"><br>
+          　※idを空白にするとランダム文字列にする<br><br>
+          🔘ノードのラベル：<input type="text" id="modal_edge_label" value="" style="width:85px;"><br>
+          🔘color(labelの色)：<input type="color" id="modal_edge_labelcolor" value="#000000"><br><br>
+          🔘source：<input type="text" id="modal_edge_source" value="" style="width:55px;"><br>
+          🔘target：<input type="text" id="modal_edge_target" value="" style="width:55px;"><br>
+          ※ここの値はQメニューと同期される<br><br>
+
+          🔘line-color：<input type="color" id="modal_edge_linecolor" value="#F00000">
+          <input type="text" id="modal_edge_linecolor_str" value="#F00000" style="width:55px;"><br><br>
+          🔘target-arrow-color：<input type="color" id="modal_edge_t_arr_color" value="#F00000">
+          <input type="text" id="modal_edge_t_arr_color_str" value="#F00000" style="width:55px;"><br>
+          🔘target-arrow-shape：<select id="modal_edge_t_arr_shape">
             <option value="none">none</option>
             <option value="triangle" selected>triangle</option>
             <option value="triangle-tee">triangle-tee</option>
@@ -470,9 +475,9 @@
             <option value="diamond">diamond</option>
             <option value="chevron">chevron</option>
           </select><br>
-          source-arrow-color：<input type="color" id="modal_edge_s_arr_color" value="#000000">
-          <input type="text" id="modal_edge_s_arr_color_str" value="#000000"><br>
-          source-arrow-shape：<select id="modal_edge_s_arr_shape">
+          🔘source-arrow-color：<input type="color" id="modal_edge_s_arr_color" value="#F00000">
+          <input type="text" id="modal_edge_s_arr_color_str" value="#F00000" style="width:55px;"><br>
+          🔘source-arrow-shape：<select id="modal_edge_s_arr_shape">
             <option value="none" selected>none</option>
             <option value="triangle">triangle</option>
             <option value="triangle-tee">triangle-tee</option>
@@ -488,8 +493,7 @@
           </select><br>
         </main>
         <footer class="modal__footer">
-          <button class="modal__btn modal__btn-primary"
-            onclick="cxt_new_edge_generate(cxt_event)">ノード作成するボタンテスト</button>
+          <button class="modal__btn modal__btn-primary" onclick="cxt_new_edge_generate(cxt_event)">新規エッジを作成する</button>
           <button class="modal__btn" data-micromodal-close
             aria-label="Close this dialog window">やっぱりやめる(ESCでも可)</button>
         </footer>
