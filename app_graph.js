@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       {
         id: 'copy-id-parent',
-        content: 'Qメニューのparentにidコピー',
+        content: '🔶Qメニューのparentにidコピー',
         tooltipText: 'copy-id-parent',
         selector: 'node',
         hasTrailingDivider: true,
@@ -341,39 +341,49 @@ document.addEventListener('DOMContentLoaded', function () {
         },
       },
       {
-        id: 'copy-id-source',
-        content: 'Qメニューのsourceにidコピー',
-        tooltipText: 'copy-id-source',
+        //右クリックからノードの色を変更する
+        id: 'qmenue-copyes',
+        content: '🔷Qメニューのエッジ用にidをコピー',
+        tooltipText: 'qmenue-copyes',
         selector: 'node',
         hasTrailingDivider: true,
-        onClickFunction: function (event) {
-          let target = event.target || event.cyTarget;
-          qmenu_elem_source.value = target.data('id');
-        },
-      },
-      {
-        id: 'copy-id-target',
-        content: 'Qメニューのtargetにidコピー',
-        tooltipText: 'copy-id-target',
-        selector: 'node',
-        hasTrailingDivider: true,
-        onClickFunction: function (event) {
-          let target = event.target || event.cyTarget;
-          qmenu_elem_target.value = target.data('id');
-        },
+        submenu: [
+          {
+            id: 'copy-id-source',
+            content: 'sourceにidコピー',
+            tooltipText: 'copy-id-source',
+            selector: 'node',
+            hasTrailingDivider: true,
+            onClickFunction: function (event) {
+              let target = event.target || event.cyTarget;
+              qmenu_elem_source.value = target.data('id');
+            },
+          },
+          {
+            id: 'copy-id-target',
+            content: 'targetにidコピー',
+            tooltipText: 'copy-id-target',
+            selector: 'node',
+            hasTrailingDivider: true,
+            onClickFunction: function (event) {
+              let target = event.target || event.cyTarget;
+              qmenu_elem_target.value = target.data('id');
+            },
+          },
+        ]
       },
 
       {
         //右クリックからノードの色を変更する
         id: 'node-color',
-        content: 'ノードの色を変更する',
+        content: '🟩ノードの色を変更する',
         tooltipText: 'change color',
         selector: 'node',
         hasTrailingDivider: true,
         submenu: [
           {
             id: 'selecting_color',
-            content: '上の部分で選択した色に変更',
+            content: '🟩Qメニューでの選択色に変更',
             tooltipText: 'select-color',
             hasTrailingDivider: true,
             onClickFunction: function (event) {
@@ -522,14 +532,14 @@ document.addEventListener('DOMContentLoaded', function () {
       {
         //右クリックからエッジの色を変更する
         id: 'edge-color',
-        content: 'エッジの色を変更する',
+        content: '🟩エッジの色を変更する',
         tooltipText: 'change color',
         selector: 'edge',
         hasTrailingDivider: true,
         submenu: [
           {
             id: 'color-select-color',
-            content: '上の部分で選択した色に変更',
+            content: '🟩Qメニューでの選択色に変更',
             tooltipText: 'select-color',
             onClickFunction: function (event) {
               let target = event.target || event.cyTarget;
@@ -671,7 +681,7 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       {
         id: 'change-node-parent',
-        content: 'parentをQメニューの値に変更',
+        content: '🔶parentをQメニューの値に変更',
         tooltipText: 'copy-id-target',
         selector: 'node',
         hasTrailingDivider: true,
@@ -684,7 +694,7 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       {
         id: 'change-elem-label',
-        content: 'labelをQメニューの値に変更',
+        content: '🟨labelをQメニューの値に変更',
         tooltipText: 'select-label',
         selector: 'node, edge',
         onClickFunction: function (event) {
@@ -927,7 +937,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
       select_elem_prop_color = event.target.style('color');
       select_elem_prop_back_color = event.target.style('background-color');
-      event.target.style('color', `#fc4d4d`);
+
+      //親の時は背景色に色溶け込むのを防ぐために、色を赤にする
+      if (event.target.isParent() === true) {
+        event.target.style('color', `#fc4d4d`);
+      } else {
+        event.target.style('color', `white`);
+      }
+
       event.target.style('background-color', `#3894fc`);
 
     } else {
