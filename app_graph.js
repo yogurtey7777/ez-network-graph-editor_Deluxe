@@ -160,6 +160,54 @@ const target_edge_color_change = function (target, color) {
   }
 }
 
+//子持ちの親ノードをコピーする関数(再帰関数)
+//まずはノードを複製し、それが子持ちノードだった場合
+//親ノードのIDと子ノードを同関数に渡し、
+const copy_node_and_children = function (target, parent_id) {
+
+  let config_parent;
+  if (parent_id === "none") {
+    config_parent = null;//一番最初用
+  } else {
+    config_parent = parent_id;//渡された親ID
+  }
+  //console.log(config_parent);
+
+  //ランダムなID
+  let new_id = Math.random().toString(32).substring(2);
+
+  let data = {
+    group: 'nodes',
+    id: new_id,//IDを設定する
+    label: `${target.data('label')}`,
+    parent: config_parent//
+  };
+
+  let style = {
+    color: `${target.style('color')}`,
+    'background-color': `${target.style('background-color')}`,
+    shape: `${target.style('shape')}`
+  };
+  cy.add({
+    data: data,
+    position: {
+      x: target.position('x') + 200,
+      y: target.position('y')
+    },
+    style: style
+  });
+
+  let child_nodes = target.children();
+
+  if (1 <= child_nodes.length) {
+    child_nodes.forEach(function (child_node) {
+      copy_node_and_children(child_node, new_id);
+    });
+  }
+
+
+}
+
 
 //JSの読み込み早すぎてhtml関係の処理でエラー出るの回避するために
 //DOMコンテンツがロードされた時に発火をさせる。
@@ -296,13 +344,13 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       {
         id: 'copy-node',
-        content: 'ノードをコピー(idはランダム)',
+        content: 'ノードを複製する(idはランダム)',
         tooltipText: 'copy-id-parent',
         selector: 'node',
         hasTrailingDivider: true,
         onClickFunction: function (event) {
+          event.target.unselect();
           let target = event.target || event.cyTarget;
-          let target_c = target.copy();
 
           let data = {
             group: 'nodes',
@@ -319,15 +367,30 @@ document.addEventListener('DOMContentLoaded', function () {
           };
           cy.add({
             data: data,
-            position: {
-              x: pos.x,
-              y: pos.y + 10
+            position: {//少し斜めにコピーする
+              x: pos.x + 100,
+              y: pos.y + 100
             },
             style: style
           });
 
           //qmenu_elem_parent.value = target.data('id');
         },
+        submenu: [
+          {
+            id: 'copy-node-child',
+            content: '(親ノードのみ)子ノードもコピー',
+            tooltipText: 'copy-id-parent',
+            selector: 'node',
+            hasTrailingDivider: true,
+            onClickFunction: function (event) {
+
+              event.target.unselect();
+              copy_node_and_children(event.target, "none")
+            },
+          }
+        ],
+
       },
       {
         id: 'copy-id-parent',
@@ -961,7 +1024,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (event.target.group() === "nodes") {
       let rgb = ColorToHex(event.target.style('background-color'));
       event.target.style('background-color', `${ invertColor(rgb) }`);
-
+  
     } else {
       let rgb = ColorToHex(event.target.style('line-color'));
       event.target.style('line-color', `${ invertColor(rgb) }`);
@@ -1029,7 +1092,7 @@ document.addEventListener('DOMContentLoaded', function () {
     now_elem_type_btn.forEach(function (elem_btn) {
       elem_btn.addEventListener("change", function () {
         console.log("tetetetetetetetete");
-  
+   
         if (elem_btn.id === 'now_elem_type_node') {
           edge_inspector.classList.add("disabled");
           node_inspector.classList.remove("disabled");
