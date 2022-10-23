@@ -407,7 +407,8 @@
           <h2 class="modal__title" id="modal-1-title">
             新規ノードを作るモーダルウィンドウです。
           </h2>
-          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close
+            onclick="MicroModal.close('cxt_node_create')"></button>
         </header>
         <main class="modal__content" id="modal-1-content">
           🔘id(重複不可,後で変更不可)：<input type="text" id="modal_node_id" value="" style="width:85px;"><br>
@@ -450,8 +451,8 @@
         </main>
         <footer class="modal__footer">
           <button class="modal__btn modal__btn-primary" onclick="cxt_new_node_generate(cxt_event)">新規ノードを作成する</button>
-          <button class="modal__btn" data-micromodal-close
-            aria-label="Close this dialog window">やっぱりやめる(ESCでも可)</button>
+          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window"
+            onclick="MicroModal.close('cxt_node_create')">やっぱりやめる(ESCでも可)</button>
         </footer>
       </div>
     </div>
@@ -466,7 +467,8 @@
           <h2 class="modal__title" id="modal-1-title">
             新規エッジを作るモーダルウィンドウです。
           </h2>
-          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close
+            onclick="MicroModal.close('cxt_edge_create')"></button>
         </header>
         <main class="modal__content" id="modal-1-content">
           🔘id(重複不可,後で変更不可)：<input type="text" id="modal_edge_id" value="" style="width:85px;"><br>
@@ -523,8 +525,8 @@
         </main>
         <footer class="modal__footer">
           <button class="modal__btn modal__btn-primary" onclick="cxt_new_edge_generate(cxt_event)">新規エッジを作成する</button>
-          <button class="modal__btn" data-micromodal-close
-            aria-label="Close this dialog window">やっぱりやめる(ESCでも可)</button>
+          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window"
+            onclick="MicroModal.close('cxt_edge_create')">やっぱりやめる(ESCでも可)</button>
         </footer>
       </div>
     </div>
@@ -532,23 +534,27 @@
 
 
   <div class="modal micromodal-slide" id="alert-modal" aria-hidden="true">
-    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+    <div class="modal__overlay" tabindex="1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title"
+        style="background-color:#FFF100;">
         <header class="modal__header">
           <h2 class="modal__title" id="modal-1-title">
-            Micromodal
+            <br>これはアラートのモーダルウィンドウです。</b>
           </h2>
           <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
         </header>
         <main class="modal__content" id="modal-1-content">
-          <p>
-            Try hitting the <code>tab</code> key and notice how the focus stays within the modal itself. Also,
-            <code>esc</code> to close modal.
-          </p>
+          <b style="color:#ff0000;">既存の要素とIDが重複しています</b><br>
+          <b style="color:#ff0000;">複数の要素に同じIDを登録することはできません</b><br><br>
+
+          <b style="color:#ff0000;">※これ出た後は、新規作成モーダルを画面外クリック<br>
+            かESCキーで閉じるのが効かなくなるので注意(原因不明)</b><br><br>
+
+          <b style="color:#ff0000;">※ランダムIDでこれ出たらラッキーです</b><br>
         </main>
         <footer class="modal__footer">
-          <button class="modal__btn modal__btn-primary">Continue</button>
-          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window"
+            onclick="MicroModal.close('alert-modal')">クローズ(他のIDを入力してください)</button>
         </footer>
       </div>
     </div>

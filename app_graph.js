@@ -21,43 +21,58 @@ const cxt_new_node_generate = function (event) {
     id_value = Math.random().toString(32).substring(2);
   }
 
-  let parent_value = modal_node_parent.value;
-  if (parent_value === "") {
-    parent_value = null;
-  }
-
-  let data = {
-    group: 'nodes',
-    id: `${id_value}`,
-    label: `${modal_node_label.value}`,
-    parent: `${parent_value}`
-  };
-
-  let pos = event.position || event.cyPosition;
-
-  let style = {
-    color: `${modal_node_labelcolor.value}`,
-    'background-color': `${modal_node_backgroundcolor.value}`,
-    shape: `${modal_node_shape.value}`
-  }
-
-  cy.add({
-    data: data,
-    position: {
-      x: pos.x,
-      y: pos.y
-    },
-    style: style
+  let cy_eles = cy.elements();
+  let error_flag = false;
+  cy_eles.forEach(function (elem) {
+    if (elem.data('id') === id_value) {
+      MicroModal.show('alert-modal');
+      error_flag = true;
+    }
   });
 
-  MicroModal.close('cxt_node_create');
+  if (error_flag === true) {
+    //console.log("error_id")
+  } else {
+    let parent_value = modal_node_parent.value;
+    if (parent_value === "") {
+      parent_value = null;
+    }
+
+    let data = {
+      group: 'nodes',
+      id: `${id_value}`,
+      label: `${modal_node_label.value}`,
+      parent: `${parent_value}`
+    };
+
+    let pos = event.position || event.cyPosition;
+
+    let style = {
+      color: `${modal_node_labelcolor.value}`,
+      'background-color': `${modal_node_backgroundcolor.value}`,
+      shape: `${modal_node_shape.value}`
+    }
+
+    cy.add({
+      data: data,
+      position: {
+        x: pos.x,
+        y: pos.y
+      },
+      style: style
+    });
+
+    MicroModal.close('cxt_node_create');
+  }
+
+
+
+
 }
 
 
 //コンテキストメニュー→モーダルウィンドウで新規エッジ作る処理
 const cxt_new_edge_generate = function (event) {
-
-
 
   let id_value = modal_edge_id.value;
   if (id_value === "") {
@@ -65,37 +80,51 @@ const cxt_new_edge_generate = function (event) {
     id_value = Math.random().toString(32).substring(2);
   }
 
-  let data = {
-    group: 'edges',
-    id: `${id_value}`,
-    source: `${modal_edge_source.value}`,
-    target: `${modal_edge_target.value}`,
-    label: `${modal_edge_label.value}`
-  };
-
-  let pos = event.position || event.cyPosition;
-
-  let style = {
-    color: `${modal_node_labelcolor.value}`,
-    'line-color': `${modal_edge_linecolor.value}`,
-    'target-arrow-color': `${modal_edge_t_arr_color.value}`,
-    'target-arrow-shape': `${modal_edge_t_arr_shape.value}`,
-    'source-arrow-color': `${modal_edge_s_arr_color.value}`,
-    'source-arrow-shape': `${modal_edge_s_arr_shape.value}`,
-    'background-color': `${modal_node_backgroundcolor.value}`,
-    shape: `${modal_node_shape.value}`
-  }
-
-  cy.add({
-    data: data,
-    position: {
-      x: pos.x,
-      y: pos.y
-    },
-    style: style
+  let cy_eles = cy.elements();
+  let error_flag = false;
+  cy_eles.forEach(function (elem) {
+    if (elem.data('id') === id_value) {
+      MicroModal.show('alert-modal');
+      error_flag = true;
+    }
   });
 
-  MicroModal.close('cxt_edge_create');
+  if (error_flag === true) {
+    //console.log("error_id")
+  } else {
+    let data = {
+      group: 'edges',
+      id: `${id_value}`,
+      source: `${modal_edge_source.value}`,
+      target: `${modal_edge_target.value}`,
+      label: `${modal_edge_label.value}`
+    };
+
+    let pos = event.position || event.cyPosition;
+
+    let style = {
+      color: `${modal_node_labelcolor.value}`,
+      'line-color': `${modal_edge_linecolor.value}`,
+      'target-arrow-color': `${modal_edge_t_arr_color.value}`,
+      'target-arrow-shape': `${modal_edge_t_arr_shape.value}`,
+      'source-arrow-color': `${modal_edge_s_arr_color.value}`,
+      'source-arrow-shape': `${modal_edge_s_arr_shape.value}`,
+      'background-color': `${modal_node_backgroundcolor.value}`,
+      shape: `${modal_node_shape.value}`
+    }
+
+    cy.add({
+      data: data,
+      position: {
+        x: pos.x,
+        y: pos.y
+      },
+      style: style
+    });
+
+    MicroModal.close('cxt_edge_create');
+  }
+
 }
 
 
