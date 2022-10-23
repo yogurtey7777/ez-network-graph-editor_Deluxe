@@ -1588,43 +1588,33 @@ window.addEventListener('beforeunload', function (event) {
   cy.edges().unselect();//エッジの選択を解除しておく
 
   HiddenNowJsonData.value = graphJsonSave().replaceAll(",}", "}").replaceAll(",\n]", "\n]");
-  //ズーム倍率とパンの座標も同じhiddenに保存する
+  //ズーム倍率とパンの座標も同じくhiddenに保存する
 
   cy_zoom.value = cy.zoom();//文字列なので後でIntに変換
   cy_pan_x.value = cy.pan('x');//文字列なので後でfloatに変換
   cy_pan_y.value = cy.pan('y');//文字列なので後でfloatに変換
 
+  //クロームでも更新時にズームや現在の図を維持する機能
+  //クッキーを利用→うまく行かなかったので廃止で
   /*
-  now_json = graphJsonSave();
-  console.log("testetetetetete")
-  console.log(now_json)
-  console.log(now_json.replace(/\r?\n/g, ''))
-  cy.add(JSON.parse(now_json.replace(/\r?\n/g, '')));*/
+  document.cookie = 'HiddenNowJsonData' + '=' + encodeURIComponent(HiddenNowJsonData.value);
+  document.cookie = 'cy_zoom' + '=' + encodeURIComponent(cy_zoom.value);
+  document.cookie = 'cy_pan_x' + '=' + encodeURIComponent(cy_pan_x.value);
+  document.cookie = 'cy_pan_y' + '=' + encodeURIComponent(cy_pan_y.value);
+  */
 });
 
 //ページを更新した後にやる処理
 window.addEventListener('load', function () {
-  //let elements = cy.elements();
-  //console.log(HiddenNowJsonData.value + "unchi");
-  //console.log(JSON.parse(HiddenNowJsonData.value.replace(",}", "}").replace(",]", "]")))
-  //cy.add(JSON.parse(HiddenNowJsonData.value.replace("[", "").replace("]", "")));
-  //console.log(HiddenNowJsonData.value);
-  //console.log(JSON.parse(HiddenNowJsonData.value))
+
 
 
   ///確認のためにコンソールログにJSONの結果出す
   console.log(HiddenNowJsonData.value)
-  //console.log(eval($("#LoadJsonData").val()))
-  //console.log(JSON.parse($("#LoadJsonData").val()))
-  //JSON.parse(HiddenNowJsonData.value)
-
   //JSON.parseでエラー出たらコンソール確認する
 
 
   cy.add(JSON.parse(HiddenNowJsonData.value));
-  //cy.remove(elements);
-  //cy.add(eval($("#LoadJsonData").val()));
-  //changeLayout();
 
   //
   cy.zoom(parseFloat(cy_zoom.value));//文字列なのでfloatに変換
@@ -1632,9 +1622,7 @@ window.addEventListener('load', function () {
     x: parseFloat(cy_pan_x.value),//文字列なのでfloatに変換
     y: parseFloat(cy_pan_y.value)//文字列なのでfloatに変換
   });
-  //console.log(cy_zoom.value);
-  //console.log(cy_pan_x.value);
-  //console.log(cy_pan_y.value);
+
 });
 
 
