@@ -1116,7 +1116,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //cytoscape.jsの[ノードかエッジ].style('color')で
 //出てくる色データが文字列の「rgb(000,000,000)」なので
 //それをHEXに変換するための関数
-function ColorToHex(color) {
+const ColorToHex = function (color) {
   let num_pick = /\d+/g;
   let three_num = color.match(num_pick);
   //console.log(three_num);
@@ -1141,7 +1141,7 @@ function ColorToHex(color) {
 //HEXの色を反転してリターンする
 //"#000000"の文字列にのみ対応
 //https://www.web-dev-qa-db-ja.com/ja/javascript/823691380/
-function invertColor(hex) {
+const invertColor = function (hex) {
 
   hex = hex.slice(1);
 
@@ -1162,7 +1162,7 @@ function invertColor(hex) {
 //HEXの色を補色にしてリターンする
 //"#000000"の文字列にのみ対応
 //https://q-az.net/complementary-color-javascript/
-function compleColor(hex) {
+const compleColor = function (hex) {
 
   hex = hex.slice(1);
 
@@ -1188,7 +1188,7 @@ function compleColor(hex) {
   return '#' + padZero(comp_r) + padZero(comp_g) + padZero(comp_b);
 }
 
-function padZero(hex_part) {
+const padZero = function (hex_part) {
   let r_hex_part = "";
 
   if (hex_part.length == 1) {
@@ -1201,6 +1201,15 @@ function padZero(hex_part) {
   return r_hex_part;
 }
 
+
+//各位置にある、文字列HEXコードをカラーピッカーに反映する
+const apply_colorpick = function (colorpick_id, inputcolor_id) {
+  const colorpicker = document.getElementById(colorpick_id);
+  const input_color = document.getElementById(inputcolor_id);
+
+  colorpicker.value = input_color.value;
+
+}
 
 
 //ファイルに使用できない記号を置換する
@@ -1545,7 +1554,9 @@ window.addEventListener('beforeunload', function (event) {
   //hiddenのinputに値を保存しておく
   //これの時点では余計な改行は入らないので、置き換えに正規表現は使 わない
 
-
+  //選択時のカラーが更新後そのままにならないようにする
+  cy.nodes().unselect();//全てのノードと
+  cy.edges().unselect();//エッジの選択を解除しておく
 
   HiddenNowJsonData.value = graphJsonSave().replaceAll(",}", "}").replaceAll(",\n]", "\n]");
   //ズーム倍率とパンの座標も同じhiddenに保存する

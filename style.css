@@ -96,12 +96,12 @@ input[type="text"][readonly] {
 
 .disabled {
   cursor: not-allowed;
-  background: rgba(15, 13, 13, 0.2);
+  background: rgba(255, 76, 76, 0.4);
 }
 
 
 .disabled input {
   pointer-events: none;
-  background: rgba(15, 13, 13, 0.2);
+  background: rgba(255, 76, 76, 0.4);
 
 }

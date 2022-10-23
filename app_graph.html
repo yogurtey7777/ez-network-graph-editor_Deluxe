@@ -64,7 +64,9 @@
     <input type=" number" id="png_scale" value="5" style="width:40px;" /><br>
 
     <span>PNG画像の背景色(カラーピッカーで指定、透過も行ける):</span>
-    <input type="color" input id="colorPicker">
+    <input type="color" input id="colorPicker" onchange="apply_colorpick(`colorPicker_str`,`colorPicker`)">
+    <input type="text" id="colorPicker_str" style="width:55px;">
+    <button onclick="apply_colorpick(`colorPicker`,`colorPicker_str`)">◎</button>
     <label><input type="radio" name="transparent" value="no" checked>透過しない</label>
     <label><input type="radio" id="tras_yes" name="transparent" value="yes">透過する</label><br>
     <b>※PNG画像の保存対象は画面に写ってる部分だけなので注意</b> <br><br>
@@ -190,8 +192,10 @@
           label(表示文字)：<input type="text" id="now_changelabel" style="width:80px;"><br>
           position：<br>x：<input type="text" id="now_pos_x" style="width:80px;">
           y：<input type="text" id="now_pos_y" style="width:80px;"><br><br>
-          color(labelの色)：<input type="color" id="now_labelcolor" value="#000000">
-          <input type="text" id="now_labelcolor_str" style="width:55px;"><br>
+          color(labelの色)：<input type="color" id="now_labelcolor" value="#000000"
+            onchange="apply_colorpick(`now_labelcolor_str`,`now_labelcolor`)">
+          <input type="text" id="now_labelcolor_str" style="width:55px;">
+          <button onclick="apply_colorpick(`now_labelcolor`,`now_labelcolor_str`)">◎</button><br>
         </td>
 
 
@@ -200,9 +204,11 @@
           <!-- ここのラジオボタンはCSSでreadonlyを強引にやっています。 -->
           ノードのみの情報<input id="now_elem_type_node" type="radio" name="now_elem_type" readonly><br><br>
           <div id="node_inspector">
-            parent：<input type="text" id="now_parent"><br><br>
-            background-color：<br><input type="color" id="now_backgroundcolor" value="#000000">
-            <input type="text" id="now_backgroundcolor_str" style="width:55px;"><br><br>
+            parent：<input type="text" id="now_parent" style="width:85px;"><br><br>
+            background-color：<br><input type="color" id="now_backgroundcolor" value="#000000"
+              onchange="apply_colorpick(`now_backgroundcolor_str`,`now_backgroundcolor`)">
+            <input type="text" id="now_backgroundcolor_str" style="width:55px;">
+            <button onclick="apply_colorpick(`now_backgroundcolor`,`now_backgroundcolor_str`)">◎</button><br><br>
             shape：<select id="now_shape">
               <option value="ellipse">ellipse</option>
               <option value="triangle">triangle</option>
@@ -236,10 +242,14 @@
 
             source：<input type="text" id="now_source" value="" style="width:55px;">
             target：<input type="text" id="now_target" value="" style="width:55px;"><br>
-            line-color：<input type="color" id="now_linecolor" value="#000000">
-            <input type="text" id="now_linecolor_str" value="#000000" style="width:55px;"><br><br>
-            target-arrow-color：<input type="color" id="now_t_arr_color" value="#000000">
-            <input type="text" id="now_t_arr_color_str" value="#000000" style="width:55px;"><br>
+            line-color：<input type="color" id="now_linecolor" value="#000000"
+              onchange="apply_colorpick(`now_linecolor_str`,`now_linecolor`)">
+            <input type="text" id="now_linecolor_str" value="#000000" style="width:55px;">
+            <button onclick="apply_colorpick(`now_linecolor`,`now_linecolor_str`)">◎</button><br><br>
+            target-arrow-color：<input type="color" id="now_t_arr_color" value="#000000"
+              onchange="apply_colorpick(`now_t_arr_color_str`,`now_t_arr_color`)">
+            <input type="text" id="now_t_arr_color_str" value="#000000" style="width:55px;">
+            <button onclick="apply_colorpick(`now_t_arr_color`,`now_t_arr_color_str`)">◎</button><br>
             target-arrow-shape：<select id="now_t_arr_shape">
               <option value="none">none</option>
               <option value="triangle" selected>triangle</option>
@@ -254,8 +264,10 @@
               <option value="diamond">diamond</option>
               <option value="chevron">chevron</option>
             </select><br>
-            source-arrow-color：<input type="color" id="now_s_arr_color" value="#000000">
-            <input type="text" id="now_s_arr_color_str" value="#000000"><br>
+            source-arrow-color：<input type="color" id="now_s_arr_color" value="#000000"
+              onchange="apply_colorpick(`now_s_arr_color_str`,`now_s_arr_color`)">
+            <input type="text" id="now_s_arr_color_str" value="#000000" style="width:55px;">
+            <button onclick="apply_colorpick(`now_s_arr_color`,`now_s_arr_color_str`)">◎</button><br>
             source-arrow-shape：<select id="now_s_arr_shape">
               <option value="none" selected>none</option>
               <option value="triangle">triangle</option>
@@ -294,8 +306,11 @@
     </tr>
     <tr>
       <td>
-        🟨右クリでラベル変更する時のテキスト：<input type="text" id="select_changelabel" value="">
-        🟩右クリで色変更する時の色：<input type="color" id="select_changecolor" value="#000000">
+        🟨右クリでラベル変更する時のテキスト：<input type="text" id="select_changelabel" value="" style="width:75px;">
+        🟩右クリで色変更する時の色：<input type="color" id="select_changecolor" value="#000000"
+          onchange="apply_colorpick(`select_changecolor_str`,`select_changecolor`)">
+        <input type="text" id="select_changecolor_str" value="#000000" style="width:55px;">
+        <button onclick="apply_colorpick(`select_changecolor`,`select_changecolor_str`)">◎</button>
       </td>
     </tr>
     <tr>
@@ -398,12 +413,17 @@
           🔘id(重複不可,後で変更不可)：<input type="text" id="modal_node_id" value="" style="width:85px;"><br>
           　※idを空白にするとランダム文字列にする<br><br>
           🔘ノードのラベル：<input type="text" id="modal_node_label" value="" style="width:85px;"><br>
-          🔘color(labelの色)：<input type="color" id="modal_node_labelcolor" value="#000000">
-          <input type="text" id="modal_node_labelcolor_str" value="#000000" style="width:55px;"><br><br><br>
+          🔘color(labelの色)：<input type="color" id="modal_node_labelcolor" value="#000000"
+            onchange="apply_colorpick(`modal_node_labelcolor_str`,`modal_node_labelcolor`)">
+          <input type="text" id="modal_node_labelcolor_str" value="#000000" style="width:55px;">
+          <button onclick="apply_colorpick(`modal_node_labelcolor`,`modal_node_labelcolor_str`)">◎</button><br><br><br>
           🔘parentのid：<input type="text" id="modal_node_parent" value="" style="width:85px;"><br>
           　※ここの値はQメニューと同期される<br><br>
-          🔘background-color：<br><input type="color" id="modal_node_backgroundcolor" value="#9dbaea">
-          <input type="text" id="modal_node_backgroundcolor_str" style="width:55px;"><br><br>
+          🔘background-color：<br><input type="color" id="modal_node_backgroundcolor" value="#9dbaea"
+            onchange="apply_colorpick(`modal_node_backgroundcolor_str`,`modal_node_backgroundcolor`)">
+          <input type="text" id="modal_node_backgroundcolor_str" style="width:55px;">
+          <button onclick="apply_colorpick(`modal_node_backgroundcolor`,
+          `modal_node_backgroundcolor_str`)">◎</button><br><br>
           🔘shape：<select id="modal_node_shape">
             <option value="ellipse">ellipse</option>
             <option value="triangle">triangle</option>
@@ -452,15 +472,22 @@
           🔘id(重複不可,後で変更不可)：<input type="text" id="modal_edge_id" value="" style="width:85px;"><br>
           　※idを空白にするとランダム文字列にする<br><br>
           🔘ノードのラベル：<input type="text" id="modal_edge_label" value="" style="width:85px;"><br>
-          🔘color(labelの色)：<input type="color" id="modal_edge_labelcolor" value="#000000"><br><br>
+          🔘color(labelの色)：<input type="color" id="modal_edge_labelcolor" value="#000000"
+            onchange="apply_colorpick(`modal_edge_labelcolor_str`,`modal_edge_labelcolor`)">
+          <input type="text" id="modal_edge_labelcolor_str" value="#000000" style="width:55px;">
+          <button onclick="apply_colorpick(`modal_edge_labelcolor`,`modal_edge_labelcolor_str`)">◎</button><br><br>
           🔘source：<input type="text" id="modal_edge_source" value="" style="width:55px;"><br>
           🔘target：<input type="text" id="modal_edge_target" value="" style="width:55px;"><br>
           ※ここの値はQメニューと同期される<br><br>
 
-          🔘line-color：<input type="color" id="modal_edge_linecolor" value="#F00000">
-          <input type="text" id="modal_edge_linecolor_str" value="#F00000" style="width:55px;"><br><br>
-          🔘target-arrow-color：<input type="color" id="modal_edge_t_arr_color" value="#F00000">
-          <input type="text" id="modal_edge_t_arr_color_str" value="#F00000" style="width:55px;"><br>
+          🔘line-color：<input type="color" id="modal_edge_linecolor" value="#F00000"
+            onchange="apply_colorpick(`modal_edge_linecolor_str`,`modal_edge_linecolor`)">
+          <input type="text" id="modal_edge_linecolor_str" value="#F00000" style="width:55px;">
+          <button onclick="apply_colorpick(`modal_edge_linecolor`,`modal_edge_linecolor_str`)">◎</button><br><br>
+          🔘target-arrow-color：<input type="color" id="modal_edge_t_arr_color" value="#F00000"
+            onchange="apply_colorpick(`modal_edge_t_arr_color_str`,`modal_edge_t_arr_color`)">
+          <input type="text" id="modal_edge_t_arr_color_str" value="#F00000" style="width:55px;">
+          <button onclick="apply_colorpick(`modal_edge_t_arr_color`,`modal_edge_t_arr_color_str`)">◎</button><br>
           🔘target-arrow-shape：<select id="modal_edge_t_arr_shape">
             <option value="none">none</option>
             <option value="triangle" selected>triangle</option>
@@ -475,8 +502,10 @@
             <option value="diamond">diamond</option>
             <option value="chevron">chevron</option>
           </select><br>
-          🔘source-arrow-color：<input type="color" id="modal_edge_s_arr_color" value="#F00000">
-          <input type="text" id="modal_edge_s_arr_color_str" value="#F00000" style="width:55px;"><br>
+          🔘source-arrow-color：<input type="color" id="modal_edge_s_arr_color" value="#F00000"
+            onchange="apply_colorpick(`modal_edge_s_arr_color_str`,`modal_edge_s_arr_color`)">
+          <input type="text" id="modal_edge_s_arr_color_str" value="#F00000" style="width:55px;">
+          <button onclick="apply_colorpick(`modal_edge_s_arr_color`,`modal_edge_s_arr_color_str`)">◎</button><br>
           🔘source-arrow-shape：<select id="modal_edge_s_arr_shape">
             <option value="none" selected>none</option>
             <option value="triangle">triangle</option>
