@@ -560,6 +560,31 @@
     </div>
   </div>
 
+  <div class="modal micromodal-slide" id="alert-modal-edge" aria-hidden="true">
+    <div class="modal__overlay" tabindex="1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title"
+        style="background-color:#FFF100;">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            <br>これはアラートのモーダルウィンドウです。</b>
+          </h2>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+        </header>
+        <main class="modal__content" id="modal-1-content">
+          <b style="color:#ff0000;">エッジのsourceかtargetのIDが間違っています</b><br>
+          <b style="color:#ff0000;">sourceとtargetに存在しないIDを指定することはできません</b><br><br>
+
+          <b style="color:#ff0000;">※これ出た後は、新規作成モーダルを画面外クリック<br>
+            かESCキーで閉じるのが効かなくなるので注意(原因不明)</b><br><br>
+        </main>
+        <footer class="modal__footer">
+          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window"
+            onclick="MicroModal.close('alert-modal-edge')">クローズ(他のIDを入力してください)</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+
 
 </body>
 
