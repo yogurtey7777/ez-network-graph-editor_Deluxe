@@ -1352,7 +1352,7 @@ const readGraphJson = function () {
   //cy.add(eval($("#LoadJsonData").val()));
 
   //JSONにケツカンマがあった場合は削除する。
-  const load_data = (LoadJsonData.value).replaceAll(",}", "}").replaceAll(/,\n*]/g, "\n]");
+  const load_data = (LoadJsonData.value).replaceAll(/ {2,}/g, " ").replaceAll(/, *}/g, "}").replaceAll(/} +}/g, "}}").replaceAll(/,\n*]/g, "\n]");
   console.log(load_data)
 
 
